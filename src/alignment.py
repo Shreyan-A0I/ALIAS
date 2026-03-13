@@ -85,13 +85,11 @@ def verify_spatial_alignment(spatial_dir, image_path, output_path, patch_size=22
 
 if __name__ == "__main__":
     spatial_data = "data/spatial"
-    hires_image = "data/spatial/tissue_hires_image.png"  # In practice use the big TIFF
-    # For mission 1 demo let's assume we can use the 1.7GB TIFF if we have RAM,
-    # or the hires png for quick verification. Let's try the TIFF.
+    hires_image = "data/spatial/tissue_hires_image.png"  
     tiff_image = "data/Targeted_Visium_Human_BreastCancer_Immunology_image.tif"
     
     out = "patch_alignment_demo.png"
-    print(f"Running Mission 1 verification on {tiff_image}...")
+    print(f"Running verification on {tiff_image}...")
     if os.path.exists(tiff_image):
        verify_spatial_alignment(spatial_data, tiff_image, out)
        print(f"Saved alignment verification to {out}")

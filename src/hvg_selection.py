@@ -61,4 +61,3 @@ if __name__ == "__main__":
     sample_h5 = "data/Targeted_Visium_Human_BreastCancer_Immunology_filtered_feature_bc_matrix.h5"
     if h5_paths := [sample_h5]: # Simulate 5 files if we had them
         top_genes, _ = robust_hvg_selection(h5_paths)
-        print("Mission 2 Execution Complete.")
