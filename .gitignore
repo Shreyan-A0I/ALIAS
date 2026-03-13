@@ -1,0 +1,41 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Conda
+.conda/
+.conda_env
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# VS Code
+.vscode/
+
+# Datasets
+data/
+*.h5
+*.tif
+*.tiff
+*.png
+*.jpg
+*.csv
+*.json
+*.tar.gz
+!data/.gitkeep
+
+# Output plots
+*.pdf
+# except we might want to track our verification images for now? No, usually ignore
+patch_alignment_demo.png
+hvg_spatial_plot.png

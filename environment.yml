@@ -1,0 +1,25 @@
+name: inv-shaf
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - python=3.10
+  - pip
+  - scanpy
+  - squidpy
+  - jupyterlab
+  - matplotlib
+  - seaborn
+  - pandas
+  - numpy
+  - scipy
+  - scikit-learn
+  - tifffile
+  - pip:
+    - torch
+    - torchvision
+    - torchaudio
+    - opencv-python
+    - spatialdata
+    - anndata
