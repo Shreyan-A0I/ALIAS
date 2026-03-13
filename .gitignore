@@ -22,17 +22,11 @@ venv.bak/
 # VS Code
 .vscode/
 
+# OS
+.DS_Store
+
 # Datasets
 data/
-*.h5
-*.tif
-*.tiff
-*.png
-*.jpg
-*.csv
-*.json
-*.tar.gz
-!data/.gitkeep
 
 # Output plots
 *.pdf
