@@ -4,9 +4,9 @@ import gc
 import os
 
 def preprocess_and_shrink_h5ad(
-    input_h5ad="data/spatialDLPFC_data.h5ad",
+    input_h5ad="data/spatialDLPFC_raw_data.h5ad",
     output_h5ad="data/spatialDLPFC_anterior_processed.h5ad",
-    top_n_genes=2000
+    top_n_genes=100
 ):
     print(f"Loading {input_h5ad} ...")
     adata = sc.read_h5ad(input_h5ad)
@@ -38,17 +38,20 @@ def preprocess_and_shrink_h5ad(
     gc.collect()
 
     # 3. Moran's I Selection
-    # To reduce the 28K+ genes, we select the top spatially correlated genes.
+    print("Filtering completely useless genes first...")
+    sc.pp.filter_genes(adata, min_cells=10)
+
     print("Normalizing counts before calculating Moran's I...")
     sc.pp.normalize_total(adata, target_sum=1e4)
     sc.pp.log1p(adata)
     
-    # Optional: we can filter completely useless genes first to speed up spatial neighbor compute
-    sc.pp.filter_genes(adata, min_cells=10)
+    print("Calculating Highly Variable Genes across donors...")
+    sc.pp.highly_variable_genes(adata, n_top_genes=3000, batch_key='sample_id')
+    adata = adata[:, adata.var['highly_variable']].copy()
     
     print("Computing Spatial Neighbors Graph...")
     # Calculate neighbors based on coordinate proximity
-    sq.gr.spatial_neighbors(adata)
+    sq.gr.spatial_neighbors(adata, library_key='sample_id')
     
     print("Calculating Moran's I spatial autocorrelation...")
     # Moran's I calculation (can take a minute)
