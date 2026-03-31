@@ -24,11 +24,15 @@ def preprocess_and_shrink_h5ad(
     # Free memory
     gc.collect()
 
-    # 2. Subset to Anterior sections only
-    # Our master sheet renaming mapped 10 _ant samples, we should subset adata to match.
-    print("Subsetting object specifically for anterior samples ('_ant')")
-    ant_mask = adata.obs['sample_id'].str.endswith('_ant', na=False)
-    adata = adata[ant_mask].copy()
+    # 2. Subset to valid Anterior sections only
+    # Our master sheet renaming mapped 10 _ant samples, but some were deleted due to physical issues.
+    # We will subset adata precisely to the samples we actually have TIFs for.
+    print("Checking data/raw_data/ for valid samples...")
+    valid_samples = [f.replace('.tif', '') for f in os.listdir('data/raw_data/') if f.endswith('.tif')]
+    print(f"Filtering to exactly these {len(valid_samples)} valid samples: {valid_samples}")
+    
+    valid_mask = adata.obs['sample_id'].isin(valid_samples)
+    adata = adata[valid_mask].copy()
     print(f"Spots after filtering: {adata.n_obs}")
     
     gc.collect()
