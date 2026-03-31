@@ -5,7 +5,7 @@ import os
 
 def preprocess_and_shrink_h5ad(
     input_h5ad="data/spatialDLPFC_raw_data.h5ad",
-    output_h5ad="data/spatialDLPFC_anterior_processed.h5ad",
+    output_h5ad="data/spatialDLPFC_processed.h5ad",
     top_n_genes=100
 ):
     print(f"Loading {input_h5ad} ...")
