@@ -28,6 +28,9 @@ venv.bak/
 # Datasets
 data/
 
+# Design prompts
+prompt*.md
+
 # Output plots
 *.pdf
 # except we might want to track our verification images for now? No, usually ignore
