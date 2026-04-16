@@ -12,8 +12,8 @@ from dataloader.dataset import make_dataloader, DONOR_TO_IDX
 
 
 def train_model1(model, dataset, labeled_indices, device,
-                 epochs=50, batch_size=256, lr=1e-3, weight_decay=1e-4,
-                 patience=10):
+                 epochs=50, batch_size=256, lr=5e-4, weight_decay=1e-4,
+                 patience=12, alpha=1.0, beta=0.1):
     """
     Train Model 1 (Invariant Learner) from scratch on the labeled set.
     Joint loss = MSE(Head A) + CrossEntropy(Head C) with GRL sign flip.
@@ -61,10 +61,12 @@ def train_model1(model, dataset, labeled_indices, device,
 
             loss_pred = mse_loss_fn(gene_preds, targets)
             loss_domain = ce_loss_fn(domain_logits, donor_labels)
-            loss_total = loss_pred + loss_domain
+            loss_total = alpha * loss_pred + beta * loss_domain
 
             optimizer.zero_grad()
             loss_total.backward()
+            # Gradient clipping to stabilize training against GRL reversals or outliers
+            nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
             optimizer.step()
 
             epoch_loss += loss_total.item()
@@ -85,7 +87,7 @@ def train_model1(model, dataset, labeled_indices, device,
                 gene_preds, domain_logits = model(features, return_domain=True)
                 loss_pred = mse_loss_fn(gene_preds, targets)
                 loss_domain = ce_loss_fn(domain_logits, donor_labels)
-                val_loss += (loss_pred + loss_domain).item()
+                val_loss += (alpha * loss_pred + beta * loss_domain).item()
                 val_batches += 1
 
         avg_val_loss = val_loss / max(val_batches, 1)
@@ -198,8 +200,9 @@ def evaluate_model1(model, dataset, test_indices, device):
         gene_preds_std, _ = model(features, return_domain=False)
 
         # Inverse-transform predictions back to original scale
+        # Use epsilon in denominator for stability during evaluation of sparse genes
         gene_preds = (
-            gene_preds_std.cpu() * dataset.gene_stds + dataset.gene_means
+            gene_preds_std.cpu() * (dataset.gene_stds + 1e-8) + dataset.gene_means
         )
 
         all_preds.append(gene_preds)

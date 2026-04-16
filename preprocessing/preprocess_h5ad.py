@@ -5,7 +5,7 @@ import os
 
 def preprocess_and_shrink_h5ad(
     input_h5ad="data/spatialDLPFC_raw_data.h5ad",
-    output_h5ad="data/spatialDLPFC_processed.h5ad",
+    output_h5ad="data/spatialDLPFC.h5ad",
     top_n_genes=100
 ):
     print(f"Loading {input_h5ad} ...")
@@ -37,9 +37,9 @@ def preprocess_and_shrink_h5ad(
     
     gc.collect()
 
-    # 3. Moran's I Selection
-    print("Filtering completely useless genes first...")
-    sc.pp.filter_genes(adata, min_cells=10)
+    # 3. Balanced Selection (Sparsity + Moran's I)
+    print(f"Filtering genes with <20% occupancy (must be in at least {int(0.20 * adata.n_obs)} spots)...")
+    sc.pp.filter_genes(adata, min_cells=int(0.20 * adata.n_obs))
 
     print("Normalizing counts before calculating Moran's I...")
     sc.pp.normalize_total(adata, target_sum=1e4)

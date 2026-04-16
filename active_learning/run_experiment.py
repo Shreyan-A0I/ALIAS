@@ -31,6 +31,8 @@ def run_experiment(
     n_rounds=25,
     acquire_pct=0.01,  # 1% of total per round
     alpha=1.0,
+    beta=0.1,
+    lr=5e-4,
     device_str=None,
 ):
     """Run the full Inv-SHAF active learning experiment."""
@@ -71,10 +73,10 @@ def run_experiment(
     all_pool_and_seed = np.concatenate([pool_indices, seed_indices])
     dataset.update_standardization(all_pool_and_seed)
 
-    model1_baseline = InvariantLearner(n_genes=n_genes).to(device)
+    model1_baseline = InvariantLearner(n_genes=n_genes, bottleneck_dim=256).to(device)
     model1_baseline = train_model1(
         model1_baseline, dataset, all_pool_and_seed, device,
-        epochs=50, batch_size=256
+        epochs=50, batch_size=256, lr=lr, alpha=alpha, beta=beta
     )
 
     baseline_pcc, baseline_per_gene = evaluate_model1(
@@ -121,9 +123,10 @@ def run_experiment(
             dataset.update_standardization(labeled)
 
             # Train Model 1 from scratch
-            model1 = InvariantLearner(n_genes=n_genes).to(device)
+            model1 = InvariantLearner(n_genes=n_genes, bottleneck_dim=256).to(device)
             model1 = train_model1(model1, dataset, labeled, device,
-                                  epochs=50, batch_size=256)
+                                  epochs=50, batch_size=256, lr=lr,
+                                  alpha=alpha, beta=beta)
 
             # Train Model 2 from scratch (needed for invariance & combined)
             model2 = None

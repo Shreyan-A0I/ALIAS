@@ -16,11 +16,11 @@ from model.gradient_reversal import GradientReversalLayer
 class Bottleneck(nn.Module):
     """Compress 1024D raw features into 128D invariant representation."""
 
-    def __init__(self, input_dim=1024, bottleneck_dim=128, dropout=0.1):
+    def __init__(self, input_dim=1024, bottleneck_dim=256, dropout=0.1):
         super().__init__()
         self.linear = nn.Linear(input_dim, bottleneck_dim)
         self.activation = nn.GELU()
-        self.norm = nn.LayerNorm(bottleneck_dim)
+        self.norm = nn.LayerNorm(bottleneck_dim, eps=1e-6)
         self.dropout = nn.Dropout(p=dropout)
 
     def forward(self, x):
@@ -38,7 +38,7 @@ class CrossAttentionGenePredictor(nn.Module):
     to a scalar prediction per gene.
     """
 
-    def __init__(self, n_genes=100, bottleneck_dim=128, n_heads=4, ffn_dim=64):
+    def __init__(self, n_genes=100, bottleneck_dim=256, n_heads=4, ffn_dim=128):
         super().__init__()
         self.n_genes = n_genes
         self.bottleneck_dim = bottleneck_dim
@@ -99,7 +99,7 @@ class DomainDiscriminator(nn.Module):
     Receives input AFTER the GRL.
     """
 
-    def __init__(self, bottleneck_dim=128, hidden_dim=64, n_donors=8):
+    def __init__(self, bottleneck_dim=256, hidden_dim=128, n_donors=8):
         super().__init__()
         self.net = nn.Sequential(
             nn.Linear(bottleneck_dim, hidden_dim),
@@ -118,8 +118,8 @@ class InvariantLearner(nn.Module):
     gene predictor (Head A), and domain discriminator (Head C + GRL).
     """
 
-    def __init__(self, input_dim=1024, bottleneck_dim=128, n_genes=100,
-                 n_heads=4, ffn_dim=64, n_donors=8, dropout=0.1):
+    def __init__(self, input_dim=1024, bottleneck_dim=256, n_genes=100,
+                 n_heads=4, ffn_dim=128, n_donors=8, dropout=0.1):
         super().__init__()
 
         self.bottleneck = Bottleneck(input_dim, bottleneck_dim, dropout)
@@ -128,7 +128,7 @@ class InvariantLearner(nn.Module):
         )
         self.grl = GradientReversalLayer()
         self.domain_discriminator = DomainDiscriminator(
-            bottleneck_dim, 64, n_donors
+            bottleneck_dim, 128, n_donors
         )
 
     def set_grl_lambda(self, lambda_):
