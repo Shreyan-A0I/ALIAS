@@ -116,8 +116,8 @@ class InvSHAFDataset(Dataset):
         labeled_targets = self.targets[labeled_indices]
         self.gene_means = labeled_targets.mean(dim=0)
         self.gene_stds = labeled_targets.std(dim=0)
-        # Prevent division by zero with small epsilon
-        self.gene_stds[self.gene_stds < 1e-8] = 1.0
+        # Prevent division by zero for near-constant genes
+        self.gene_stds[self.gene_stds < 1e-6] = 1.0
 
     def __len__(self):
         return self.n_samples
@@ -126,8 +126,6 @@ class InvSHAFDataset(Dataset):
         target_standardized = (
             (self.targets[idx] - self.gene_means) / self.gene_stds
         )
-        # Clip targets to prevent extreme outliers from destabilizing training
-        target_standardized = torch.clamp(target_standardized, min=-10.0, max=10.0)
 
         return {
             "features": self.features[idx],       # (1024,)

@@ -31,7 +31,7 @@ def run_experiment(
     n_rounds=25,
     acquire_pct=0.01,  # 1% of total per round
     alpha=1.0,
-    beta=0.1,
+    beta=1.0,
     lr=5e-4,
     device_str=None,
 ):
