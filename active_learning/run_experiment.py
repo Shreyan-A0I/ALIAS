@@ -33,6 +33,7 @@ def run_experiment(
     alpha=1.0,
     beta=1.0,
     lr=5e-4,
+    features="convnext",
     device_str=None,
 ):
     """Run the full Inv-SHAF active learning experiment."""
@@ -55,7 +56,12 @@ def run_experiment(
     print("LOADING DATASET")
     print("=" * 60)
 
-    dataset = InvSHAFDataset()
+    # Set feature directory based on selection
+    feat_dir = "data/cached_features"
+    if features == "uni":
+        feat_dir = "data/cached_features_uni"
+
+    dataset = InvSHAFDataset(cached_features_dir=feat_dir)
     test_indices, pool_indices, seed_indices = create_splits(dataset)
 
     n_total = dataset.n_samples
@@ -220,4 +226,16 @@ def run_experiment(
 
 
 if __name__ == "__main__":
-    run_experiment()
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--features", type=str, default="convnext", choices=["convnext", "uni"])
+    parser.add_argument("--rounds", type=int, default=25)
+    parser.add_argument("--beta", type=float, default=1.0)
+    args = parser.parse_args()
+
+    run_experiment(
+        n_rounds=args.rounds,
+        beta=args.beta,
+        features=args.features
+    )

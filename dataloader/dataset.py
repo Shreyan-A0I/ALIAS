@@ -39,6 +39,7 @@ class InvSHAFDataset(Dataset):
         h5ad_path="data/spatialDLPFC.h5ad",
     ):
         super().__init__()
+        self.cached_features_dir = cached_features_dir
 
         # --- Load all cached features ---
         self.barcodes = []
@@ -46,7 +47,7 @@ class InvSHAFDataset(Dataset):
         self.features = []
 
         for donor_id in DONOR_IDS:
-            cache_path = os.path.join(cached_features_dir, f"{donor_id}.pt")
+            cache_path = os.path.join(self.cached_features_dir, f"{donor_id}.pt")
             cache = torch.load(cache_path, weights_only=False)
 
             for bc in cache["barcodes"]:
