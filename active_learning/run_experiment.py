@@ -67,8 +67,10 @@ def run_experiment(
     n_total = dataset.n_samples
     n_acquire = int(acquire_pct * n_total)  # ~309 patches per round
     n_genes = dataset.n_genes
+    input_dim = dataset.features.shape[1]
 
     print(f"Acquisition batch size: {n_acquire} patches per round")
+    print(f"Feature dimension: {input_dim}")
 
     # ========== BASELINE ==========
     print("\n" + "=" * 60)
@@ -79,7 +81,11 @@ def run_experiment(
     all_pool_and_seed = np.concatenate([pool_indices, seed_indices])
     dataset.update_standardization(all_pool_and_seed)
 
-    model1_baseline = InvariantLearner(n_genes=n_genes, bottleneck_dim=256).to(device)
+    model1_baseline = InvariantLearner(
+        input_dim=input_dim,
+        n_genes=n_genes,
+        bottleneck_dim=256,
+    ).to(device)
     model1_baseline = train_model1(
         model1_baseline, dataset, all_pool_and_seed, device,
         epochs=50, batch_size=256, lr=lr, alpha=alpha, beta=beta
@@ -129,7 +135,11 @@ def run_experiment(
             dataset.update_standardization(labeled)
 
             # Train Model 1 from scratch
-            model1 = InvariantLearner(n_genes=n_genes, bottleneck_dim=256).to(device)
+            model1 = InvariantLearner(
+                input_dim=input_dim,
+                n_genes=n_genes,
+                bottleneck_dim=256,
+            ).to(device)
             model1 = train_model1(model1, dataset, labeled, device,
                                   epochs=50, batch_size=256, lr=lr,
                                   alpha=alpha, beta=beta)
@@ -137,7 +147,10 @@ def run_experiment(
             # Train Model 2 from scratch (needed for invariance & combined)
             model2 = None
             if strategy in ("invariance", "combined"):
-                model2 = BatchEffectCheater(n_genes=n_genes).to(device)
+                model2 = BatchEffectCheater(
+                    input_dim=input_dim,
+                    n_genes=n_genes,
+                ).to(device)
                 model2 = train_model2(model2, dataset, labeled, device,
                                       epochs=100, batch_size=64)
 
