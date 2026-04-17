@@ -28,8 +28,14 @@ venv.bak/
 # Datasets
 data/
 
+# Design prompts
+prompt*.md
+*optimization.md
+
 # Output plots
 *.pdf
 # except we might want to track our verification images for now? No, usually ignore
 patch_alignment_demo.png
 hvg_spatial_plot.png
+
+uni.bin
