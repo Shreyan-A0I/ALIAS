@@ -18,6 +18,7 @@ class Bottleneck(nn.Module):
 
     def __init__(self, input_dim=1024, bottleneck_dim=256, dropout=0.1):
         super().__init__()
+        # input_dim is now flexible to support 1024 (ConvNeXt) or 1536 (UNI2-h)
         self.linear = nn.Linear(input_dim, bottleneck_dim)
         self.activation = nn.GELU()
         self.norm = nn.LayerNorm(bottleneck_dim, eps=1e-6)
