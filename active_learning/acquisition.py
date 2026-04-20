@@ -10,7 +10,46 @@ Acquisition functions for the active learning loop.
 
 import torch
 import numpy as np
-from dataloader.dataset import make_dataloader, DONOR_TO_IDX
+from torch.utils.data import DataLoader, Subset
+
+
+def make_dataloader(dataset, indices, batch_size=256, shuffle=False):
+    """Lightweight DataLoader helper for acquisition-time scoring."""
+    subset = Subset(dataset, indices)
+    return DataLoader(subset, batch_size=batch_size, shuffle=shuffle, num_workers=0)
+
+
+def _balanced_top_k_by_donor(dataset, pool_indices, scores, n_acquire):
+    """
+    Pick high-scoring points while spreading selections across donors.
+    We round-robin over donor-specific ranked lists until k points are chosen.
+    """
+    donor_rankings = {}
+    for idx, score in zip(pool_indices, scores):
+        donor_id = dataset.donor_ids[idx]
+        donor_rankings.setdefault(donor_id, []).append((float(score), int(idx)))
+
+    for donor_id in donor_rankings:
+        donor_rankings[donor_id].sort(key=lambda pair: pair[0], reverse=True)
+
+    donor_order = list(donor_rankings.keys())
+    cursors = {donor_id: 0 for donor_id in donor_order}
+    selected = []
+
+    while len(selected) < n_acquire:
+        made_progress = False
+        for donor_id in donor_order:
+            cursor = cursors[donor_id]
+            if cursor < len(donor_rankings[donor_id]):
+                selected.append(donor_rankings[donor_id][cursor][1])
+                cursors[donor_id] += 1
+                made_progress = True
+                if len(selected) == n_acquire:
+                    break
+        if not made_progress:
+            break
+
+    return np.array(selected, dtype=int)
 
 
 def acquire_random(dataset, pool_indices, n_acquire, rng):
@@ -122,15 +161,15 @@ def compute_invariance_violation(model1, model2, dataset, pool_indices, device):
 def acquire_uncertainty(model, dataset, pool_indices, n_acquire, device):
     """Strategy 2: Select patches with highest MC Dropout uncertainty."""
     u_mc = compute_mc_uncertainty(model, dataset, pool_indices, device)
-    top_k = np.argsort(u_mc)[::-1][:n_acquire]
-    return pool_indices[top_k], u_mc
+    selected = _balanced_top_k_by_donor(dataset, pool_indices, u_mc, n_acquire)
+    return selected, u_mc
 
 
 def acquire_invariance(model1, model2, dataset, pool_indices, n_acquire, device):
     """Strategy 3: Select patches with highest invariance violation."""
     v_inv = compute_invariance_violation(model1, model2, dataset, pool_indices, device)
-    top_k = np.argsort(v_inv)[::-1][:n_acquire]
-    return pool_indices[top_k], v_inv
+    selected = _balanced_top_k_by_donor(dataset, pool_indices, v_inv, n_acquire)
+    return selected, v_inv
 
 
 def acquire_combined(model1, model2, dataset, pool_indices, n_acquire, device, alpha=1.0):
@@ -147,5 +186,5 @@ def acquire_combined(model1, model2, dataset, pool_indices, n_acquire, device, a
 
     combined = u_mc_norm + alpha * v_inv_norm
 
-    top_k = np.argsort(combined)[::-1][:n_acquire]
-    return pool_indices[top_k], u_mc, v_inv
+    selected = _balanced_top_k_by_donor(dataset, pool_indices, combined, n_acquire)
+    return selected, u_mc, v_inv
