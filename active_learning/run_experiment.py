@@ -22,7 +22,7 @@ from model.model1 import InvariantLearner
 from model.model2 import BatchEffectCheater
 from active_learning.trainer import train_model1, train_model2, evaluate_model1
 from active_learning.acquisition import (
-    acquire_spatial_min
+    acquire_kmeans_core, acquire_adversarial_batch
 )
 
 
@@ -84,7 +84,7 @@ def run_experiment(
         baseline_results = {}
 
     # ========== ACTIVE LEARNING LOOP ==========
-    strategies = ["spatial_min"]
+    strategies = ["kmeans_core", "adversarial_batch"]
 
     all_results = {"baseline": baseline_results, "strategies": {}}
 
@@ -145,12 +145,18 @@ def run_experiment(
             })
 
             # --- ACQUIRE ---
-            if strategy == "spatial_min":
-                acquired, spatial_score = acquire_spatial_min(
+            if strategy == "kmeans_core":
+                acquired, _ = acquire_kmeans_core(
+                    dataset, pool, n_acquire, device
+                )
+                strategy_scores.append({}) # No score
+                
+            elif strategy == "adversarial_batch":
+                acquired, entropies = acquire_adversarial_batch(
                     model1, dataset, pool, n_acquire, device
                 )
                 strategy_scores.append({
-                    "mean_spatial_score_acquired": float(spatial_score[np.isin(pool, acquired)].mean())
+                    "mean_entropy_acquired": float(entropies[np.isin(pool, acquired)].mean())
                     if len(acquired) > 0 else 0.0
                 })
 

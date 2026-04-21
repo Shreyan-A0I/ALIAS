@@ -5,12 +5,14 @@ Acquisition functions for the active learning loop.
   1. Random sampling (null hypothesis)
   2. MC Dropout uncertainty (U_MC)
   3. Invariance violation score (V_Inv)
-  4. Spatial Structure Maximization (Moran's I weighted expression)
-  5. Feature-Space Diversity (K-Center Greedy Coreset)
+  4. Spatial Min (Inverse Moran's I)
+  5. Feature-Space Cluster Centroids (K-Means Core)
+  6. Adversarial Batch-Effect Hunting (Discriminator Entropy)
 """
 
 import torch
 import numpy as np
+from sklearn.cluster import MiniBatchKMeans
 from dataloader.dataset import make_dataloader, DONOR_TO_IDX
 
 
@@ -101,54 +103,78 @@ def acquire_spatial_min(model, dataset, pool_indices, n_acquire, device):
     bottom_k = np.argsort(scores)[:n_acquire]
     return pool_indices[bottom_k], scores
 
-def acquire_diversity(dataset, pool_indices, labeled_indices, n_acquire, device):
+def acquire_kmeans_core(dataset, pool_indices, n_acquire, device):
     """
-    Strategy 5: Feature-Space Diversity (K-Center Greedy / Coreset).
-    Selects unlabeled patches whose features are furthest from any currently labeled patch.
-    Calculates Euclidean distance directly on the base features.
+    Strategy 5: Feature-Space Cluster Centroids.
+    Clusters the raw 1536D features using MiniBatchKMeans and acquires the patch closest to each centroid.
+    Ensures highly representative feature sampling while ignoring visual outliers.
     """
-    # Move features to GPU if possible to speed up distance calcs, or keep on CPU
-    labeled_features = dataset.features[labeled_indices].to(device)
-    pool_features = dataset.features[pool_indices].to(device)
+    pool_features = dataset.features[pool_indices].numpy()
     
-    # We will incrementally pick the furthest point, add it to our "labeled" set, and repeat
-    # For large pools, computing full pairwise D=O(N*M) is expensive.
-    # Instead, we just maintain the minimum distance to the labeled set for each pool point.
+    # Fast clustering
+    kmeans = MiniBatchKMeans(
+        n_clusters=n_acquire, 
+        batch_size=1024, 
+        n_init='auto', 
+        random_state=42
+    )
+    kmeans.fit(pool_features)
+    
+    # K-means centroid feature vectors (n_acquire, 1536)
+    centroids = torch.tensor(kmeans.cluster_centers_, device=device)
+    pool_features_tensor = dataset.features[pool_indices].to(device)
+    
+    # Find the nearest pool point for each centroid
+    # cdist shape: (n_acquire, n_pool)
+    dists = torch.cdist(centroids, pool_features_tensor)
+    
+    # For each centroid, get the index of the closest pool patch
+    closest_idxs = dists.argmin(dim=1).cpu().numpy()
+    
+    # Ensure uniqueness in case multiple centroids map to the same point (rare, but fallback)
+    unique_idxs = list(set(closest_idxs))
+    if len(unique_idxs) < n_acquire:
+        # Fill randomly if duplicates happened
+        remaining = n_acquire - len(unique_idxs)
+        available = list(set(range(len(pool_indices))) - set(unique_idxs))
+        fillers = np.random.choice(available, remaining, replace=False)
+        unique_idxs.extend(fillers)
+    
+    return pool_indices[unique_idxs], None
 
-    # 1. Compute initial min distances from each pool point to ANY labeled point
-    # Since labeled_features can be ~3000, we batch the calculation over pool points
-    n_pool = pool_features.shape[0]
-    min_dist = torch.full((n_pool,), float('inf'), device=device)
+
+@torch.no_grad()
+def acquire_adversarial_batch(model, dataset, pool_indices, n_acquire, device):
+    """
+    Strategy 6: Adversarial Batch-Effect Hunting.
+    Evaluates the unlabeled patches using the Domain Discriminator.
+    Acquires patches with the lowest Entropy (i.e., highest Discriminator certainty of batch effect).
+    """
+    model.eval()
+    model.to(device)
     
-    batch_size = 512
-    for i in range(0, n_pool, batch_size):
-        end = min(i + batch_size, n_pool)
-        batch = pool_features[i:end]
-        # Pairwise distance: (batch_size, 1, 1536) - (1, n_labeled, 1536) -> (batch_size, n_labeled)
-        # Using torch.cdist for memory efficiency
-        dists = torch.cdist(batch, labeled_features, p=2.0)
-        min_dist[i:end] = dists.min(dim=1)[0]
-        
-    selected_pool_idx = []
+    loader = make_dataloader(dataset, pool_indices, batch_size=512, shuffle=False)
+    all_entropies = []
     
-    # 2. Greedily pick furthest
-    for _ in range(n_acquire):
-        # Find the point with the maximum minimum distance
-        furthest_idx = torch.argmax(min_dist).item()
-        selected_pool_idx.append(furthest_idx)
+    for batch in loader:
+        features = batch["features"].to(device)
         
-        # The new point is now "labeled". Update the min_dist for all remaining pool points.
-        new_point = pool_features[furthest_idx:furthest_idx+1]
+        # We MUST ensure GRL returns domain logits
+        # return_domain=True allows the patch to pass through the GRL and into Head C
+        _, domain_logits = model(features, return_domain=True)
         
-        new_dists = torch.cdist(pool_features, new_point, p=2.0).squeeze(1)
-        # Update minimum distances efficiently
-        min_dist = torch.minimum(min_dist, new_dists)
+        # Convert logits to probabilities
+        probs = torch.softmax(domain_logits, dim=-1)
         
-        # Don't pick this point again
-        min_dist[furthest_idx] = -1.0
+        # Calculate Entropy: -sum(p * log(p + epsilon))
+        entropy = -torch.sum(probs * torch.log(probs + 1e-8), dim=-1)
+        all_entropies.append(entropy.cpu())
         
-    acquired_actual_indices = pool_indices[selected_pool_idx]
-    return acquired_actual_indices, None  # No 'score' array to return like the others
+    entropies = torch.cat(all_entropies, dim=0).numpy()
+    
+    # Lowest entropy = highest confidence in batch effect
+    bottom_k = np.argsort(entropies)[:n_acquire]
+    return pool_indices[bottom_k], entropies
 
 
 @torch.no_grad()
