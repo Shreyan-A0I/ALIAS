@@ -1,11 +1,11 @@
 """
 Acquisition functions for the active learning loop.
 
-4 strategies:
+6 strategies:
   1. Random sampling (null hypothesis)
   2. MC Dropout uncertainty (U_MC)
   3. Invariance violation score (V_Inv)
-  4. Spatial Min (Inverse Moran's I)
+  4. Spatial Max (Moran's I)
   5. Feature-Space Cluster Centroids (K-Means Core)
   6. Adversarial Batch-Effect Hunting (Discriminator Entropy)
 """

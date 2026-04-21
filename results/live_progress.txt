@@ -1,0 +1,723 @@
+=== ALIAS PROJECT LIVE PROGRESS LOG ===
+Started: Tue Apr 21 04:06:30 2026
+
+[04:07:39] START: random | Seed 13
+[04:07:39] START: random | Seed 27
+[04:07:39] START: invariance | Seed 233
+[04:07:39] START: invariance | Seed 104
+[04:07:39] START: uncertainty | Seed 89
+[04:07:39] START: invariance | Seed 401
+[04:07:39] START: random | Seed 56
+[04:07:39] START: random | Seed 233
+[04:07:39] START: uncertainty | Seed 401
+[04:07:39] START: uncertainty | Seed 56
+[04:07:39] START: spatial_min | Seed 27
+[04:07:39] START: random | Seed 892
+[04:07:39] START: uncertainty | Seed 104
+[04:07:39] START: invariance | Seed 89
+[04:07:39] START: uncertainty | Seed 13
+[04:07:39] START: uncertainty | Seed 777
+[04:07:39] START: invariance | Seed 892
+[04:07:39] START: invariance | Seed 27
+[04:07:39] START: uncertainty | Seed 233
+[04:07:39] START: invariance | Seed 13
+[04:07:39] START: random | Seed 89
+[04:07:39] START: uncertainty | Seed 999
+[04:07:39] START: random | Seed 104
+[04:07:39] START: uncertainty | Seed 892
+[04:07:39] START: random | Seed 999
+[04:07:39] START: spatial_min | Seed 13
+[04:07:39] START: random | Seed 401
+[04:07:39] START: invariance | Seed 777
+[04:07:39] START: invariance | Seed 56
+[04:07:39] START: invariance | Seed 999
+[04:07:39] START: uncertainty | Seed 27
+[04:07:39] START: random | Seed 777
+[04:07:56] Progress: random Seed 233 | Round 1/45 | PCC: 0.1129
+[04:07:56] Progress: uncertainty Seed 13 | Round 1/45 | PCC: 0.1081
+[04:07:56] Progress: spatial_min Seed 13 | Round 1/45 | PCC: 0.1081
+[04:07:57] Progress: random Seed 13 | Round 1/45 | PCC: 0.1081
+[04:07:57] Progress: uncertainty Seed 233 | Round 1/45 | PCC: 0.1129
+[04:07:58] Progress: random Seed 89 | Round 1/45 | PCC: 0.0604
+[04:07:58] Progress: uncertainty Seed 89 | Round 1/45 | PCC: 0.0604
+[04:07:58] Progress: random Seed 104 | Round 1/45 | PCC: 0.1013
+[04:07:58] Progress: random Seed 892 | Round 1/45 | PCC: 0.0875
+[04:07:58] Progress: uncertainty Seed 27 | Round 1/45 | PCC: 0.1171
+[04:07:58] Progress: uncertainty Seed 999 | Round 1/45 | PCC: 0.1086
+[04:07:58] Progress: uncertainty Seed 56 | Round 1/45 | PCC: 0.0201
+[04:07:58] Progress: uncertainty Seed 892 | Round 1/45 | PCC: 0.0875
+[04:07:59] Progress: random Seed 27 | Round 1/45 | PCC: 0.1171
+[04:07:59] Progress: uncertainty Seed 104 | Round 1/45 | PCC: 0.1013
+[04:07:59] Progress: random Seed 401 | Round 1/45 | PCC: 0.1058
+[04:07:59] Progress: spatial_min Seed 27 | Round 1/45 | PCC: 0.1171
+[04:07:59] Progress: random Seed 777 | Round 1/45 | PCC: 0.1081
+[04:07:59] Progress: random Seed 56 | Round 1/45 | PCC: 0.0201
+[04:07:59] Progress: uncertainty Seed 401 | Round 1/45 | PCC: 0.1058
+[04:07:59] Progress: uncertainty Seed 777 | Round 1/45 | PCC: 0.1081
+[04:08:00] Progress: invariance Seed 13 | Round 1/45 | PCC: 0.1081
+[04:08:00] Progress: invariance Seed 233 | Round 1/45 | PCC: 0.1129
+[04:08:00] Progress: random Seed 999 | Round 1/45 | PCC: 0.1086
+[04:08:01] Progress: invariance Seed 892 | Round 1/45 | PCC: 0.0875
+[04:08:01] Progress: invariance Seed 27 | Round 1/45 | PCC: 0.1171
+[04:08:01] Progress: invariance Seed 56 | Round 1/45 | PCC: 0.0201
+[04:08:02] Progress: invariance Seed 401 | Round 1/45 | PCC: 0.1058
+[04:08:02] Progress: invariance Seed 777 | Round 1/45 | PCC: 0.1081
+[04:08:02] Progress: invariance Seed 999 | Round 1/45 | PCC: 0.1086
+[04:08:02] Progress: invariance Seed 104 | Round 1/45 | PCC: 0.1013
+[04:08:02] Progress: invariance Seed 89 | Round 1/45 | PCC: 0.0604
+[04:09:34] Progress: random Seed 56 | Round 5/45 | PCC: 0.1247
+[04:09:37] Progress: random Seed 892 | Round 5/45 | PCC: 0.1375
+[04:09:37] Progress: random Seed 233 | Round 5/45 | PCC: 0.0778
+[04:09:38] Progress: random Seed 89 | Round 5/45 | PCC: 0.0977
+[04:09:39] Progress: random Seed 104 | Round 5/45 | PCC: 0.1248
+[04:09:41] Progress: random Seed 13 | Round 5/45 | PCC: 0.1482
+[04:09:41] Progress: random Seed 401 | Round 5/45 | PCC: 0.0711
+[04:09:43] Progress: random Seed 27 | Round 5/45 | PCC: 0.1275
+[04:09:45] Progress: random Seed 777 | Round 5/45 | PCC: 0.1183
+[04:09:54] Progress: random Seed 999 | Round 5/45 | PCC: 0.0999
+[04:11:24] Progress: spatial_min Seed 13 | Round 5/45 | PCC: 0.1308
+[04:11:43] Progress: invariance Seed 27 | Round 5/45 | PCC: 0.1168
+[04:11:45] Progress: invariance Seed 401 | Round 5/45 | PCC: 0.0847
+[04:11:46] Progress: spatial_min Seed 27 | Round 5/45 | PCC: 0.1247
+[04:11:46] Progress: invariance Seed 104 | Round 5/45 | PCC: 0.1195
+[04:11:50] Progress: invariance Seed 892 | Round 5/45 | PCC: 0.1285
+[04:11:51] Progress: invariance Seed 233 | Round 5/45 | PCC: 0.1184
+[04:11:51] Progress: invariance Seed 13 | Round 5/45 | PCC: 0.1356
+[04:11:56] Progress: invariance Seed 999 | Round 5/45 | PCC: 0.1070
+[04:12:01] Progress: invariance Seed 56 | Round 5/45 | PCC: 0.1092
+[04:12:09] Progress: invariance Seed 89 | Round 5/45 | PCC: 0.1049
+[04:12:14] Progress: invariance Seed 777 | Round 5/45 | PCC: 0.1244
+[04:12:29] Progress: random Seed 892 | Round 10/45 | PCC: 0.1337
+[04:12:32] Progress: random Seed 56 | Round 10/45 | PCC: 0.1287
+[04:12:35] Progress: random Seed 233 | Round 10/45 | PCC: 0.1395
+[04:12:39] Progress: random Seed 401 | Round 10/45 | PCC: 0.0635
+[04:12:40] Progress: random Seed 89 | Round 10/45 | PCC: 0.1022
+[04:12:43] Progress: random Seed 104 | Round 10/45 | PCC: 0.1292
+[04:12:43] Progress: random Seed 777 | Round 10/45 | PCC: 0.1083
+[04:12:43] Progress: random Seed 27 | Round 10/45 | PCC: 0.0321
+[04:12:45] Progress: random Seed 13 | Round 10/45 | PCC: 0.0836
+[04:13:07] Progress: random Seed 999 | Round 10/45 | PCC: 0.1233
+[04:16:27] Progress: random Seed 56 | Round 15/45 | PCC: 0.0945
+[04:16:29] Progress: random Seed 233 | Round 15/45 | PCC: 0.1371
+[04:16:34] Progress: random Seed 892 | Round 15/45 | PCC: 0.0578
+[04:16:39] Progress: random Seed 89 | Round 15/45 | PCC: 0.1066
+[04:16:39] Progress: random Seed 401 | Round 15/45 | PCC: 0.0874
+[04:16:45] Progress: random Seed 777 | Round 15/45 | PCC: 0.1128
+[04:16:47] Progress: random Seed 13 | Round 15/45 | PCC: 0.1384
+[04:16:47] Progress: random Seed 27 | Round 15/45 | PCC: 0.0935
+[04:16:50] Progress: spatial_min Seed 13 | Round 10/45 | PCC: 0.1256
+[04:16:54] Progress: random Seed 104 | Round 15/45 | PCC: 0.1367
+[04:17:24] Progress: random Seed 999 | Round 15/45 | PCC: 0.0830
+[04:17:28] Progress: spatial_min Seed 27 | Round 10/45 | PCC: 0.1175
+[04:17:29] Progress: invariance Seed 27 | Round 10/45 | PCC: 0.0900
+[04:17:40] Progress: invariance Seed 892 | Round 10/45 | PCC: 0.0951
+[04:17:41] Progress: invariance Seed 999 | Round 10/45 | PCC: 0.0577
+[04:17:42] Progress: invariance Seed 401 | Round 10/45 | PCC: 0.1389
+[04:17:46] Progress: invariance Seed 89 | Round 10/45 | PCC: 0.1156
+[04:17:47] Progress: invariance Seed 56 | Round 10/45 | PCC: 0.1311
+[04:17:49] Progress: invariance Seed 104 | Round 10/45 | PCC: 0.1254
+[04:17:51] Progress: invariance Seed 233 | Round 10/45 | PCC: 0.1306
+[04:18:03] Progress: invariance Seed 13 | Round 10/45 | PCC: 0.1371
+[04:18:17] Progress: invariance Seed 777 | Round 10/45 | PCC: 0.0863
+[04:21:18] Progress: random Seed 233 | Round 20/45 | PCC: 0.1302
+[04:21:23] Progress: random Seed 56 | Round 20/45 | PCC: 0.0832
+[04:21:28] Progress: random Seed 401 | Round 20/45 | PCC: 0.1221
+[04:21:29] Progress: random Seed 892 | Round 20/45 | PCC: 0.1417
+[04:21:33] Progress: random Seed 89 | Round 20/45 | PCC: 0.1111
+[04:21:40] Progress: random Seed 13 | Round 20/45 | PCC: 0.1141
+[04:21:42] Progress: random Seed 777 | Round 20/45 | PCC: 0.1115
+[04:21:48] Progress: random Seed 104 | Round 20/45 | PCC: 0.1279
+[04:21:51] Progress: random Seed 27 | Round 20/45 | PCC: 0.1238
+[04:22:27] Progress: random Seed 999 | Round 20/45 | PCC: 0.0886
+[04:23:19] Progress: spatial_min Seed 13 | Round 15/45 | PCC: 0.1065
+[04:23:50] Progress: spatial_min Seed 27 | Round 15/45 | PCC: 0.1160
+[04:24:19] Progress: invariance Seed 27 | Round 15/45 | PCC: 0.1362
+[04:24:34] Progress: invariance Seed 89 | Round 15/45 | PCC: 0.1333
+[04:24:35] Progress: invariance Seed 999 | Round 15/45 | PCC: 0.1296
+[04:24:35] Progress: invariance Seed 401 | Round 15/45 | PCC: 0.1367
+[04:24:43] Progress: invariance Seed 233 | Round 15/45 | PCC: 0.1183
+[04:24:45] Progress: invariance Seed 56 | Round 15/45 | PCC: 0.1372
+[04:24:45] Progress: invariance Seed 892 | Round 15/45 | PCC: 0.1555
+[04:24:48] Progress: invariance Seed 13 | Round 15/45 | PCC: 0.1317
+[04:24:57] Progress: invariance Seed 104 | Round 15/45 | PCC: 0.1394
+[04:25:19] Progress: invariance Seed 777 | Round 15/45 | PCC: 0.1393
+[04:26:52] Progress: uncertainty Seed 999 | Round 5/45 | PCC: 0.1211
+[04:27:19] Progress: random Seed 89 | Round 25/45 | PCC: 0.1296
+[04:27:19] Progress: random Seed 56 | Round 25/45 | PCC: 0.1366
+[04:27:20] Progress: random Seed 401 | Round 25/45 | PCC: 0.1319
+[04:27:32] Progress: random Seed 104 | Round 25/45 | PCC: 0.1403
+[04:27:34] Progress: random Seed 777 | Round 25/45 | PCC: 0.1311
+[04:27:36] Progress: random Seed 13 | Round 25/45 | PCC: 0.1183
+[04:27:50] Progress: random Seed 27 | Round 25/45 | PCC: 0.1231
+[04:27:57] Progress: uncertainty Seed 13 | Round 5/45 | PCC: 0.1382
+[04:28:09] Progress: random Seed 233 | Round 25/45 | PCC: 0.1343
+[04:28:11] Progress: random Seed 892 | Round 25/45 | PCC: 0.1799
+[04:28:15] Progress: uncertainty Seed 104 | Round 5/45 | PCC: 0.1275
+[04:28:17] Progress: uncertainty Seed 89 | Round 5/45 | PCC: 0.1238
+[04:28:18] Progress: random Seed 999 | Round 25/45 | PCC: 0.1356
+[04:28:52] Progress: uncertainty Seed 892 | Round 5/45 | PCC: 0.1211
+[04:28:52] Progress: uncertainty Seed 777 | Round 5/45 | PCC: 0.1031
+[04:29:13] Progress: uncertainty Seed 56 | Round 5/45 | PCC: 0.0841
+[04:29:23] Progress: uncertainty Seed 27 | Round 5/45 | PCC: 0.1164
+[04:30:13] Progress: uncertainty Seed 233 | Round 5/45 | PCC: 0.1035
+[04:30:46] Progress: spatial_min Seed 13 | Round 20/45 | PCC: 0.1092
+[04:30:48] Progress: uncertainty Seed 401 | Round 5/45 | PCC: 0.1215
+[04:31:34] Progress: spatial_min Seed 27 | Round 20/45 | PCC: 0.1101
+[04:32:05] Progress: invariance Seed 27 | Round 20/45 | PCC: 0.1362
+[04:32:28] Progress: invariance Seed 999 | Round 20/45 | PCC: 0.1403
+[04:32:33] Progress: invariance Seed 233 | Round 20/45 | PCC: 0.1168
+[04:32:35] Progress: invariance Seed 401 | Round 20/45 | PCC: 0.1497
+[04:32:42] Progress: invariance Seed 89 | Round 20/45 | PCC: 0.1429
+[04:32:45] Progress: invariance Seed 56 | Round 20/45 | PCC: 0.1255
+[04:32:53] Progress: invariance Seed 13 | Round 20/45 | PCC: 0.1466
+[04:33:03] Progress: invariance Seed 104 | Round 20/45 | PCC: 0.1432
+[04:33:06] Progress: invariance Seed 892 | Round 20/45 | PCC: 0.1410
+[04:33:24] Progress: invariance Seed 777 | Round 20/45 | PCC: 0.1261
+[04:34:13] Progress: random Seed 56 | Round 30/45 | PCC: 0.1119
+[04:34:14] Progress: random Seed 13 | Round 30/45 | PCC: 0.1389
+[04:34:22] Progress: random Seed 104 | Round 30/45 | PCC: 0.1524
+[04:34:47] Progress: random Seed 89 | Round 30/45 | PCC: 0.1663
+[04:34:50] Progress: random Seed 892 | Round 30/45 | PCC: 0.1426
+[04:35:05] Progress: random Seed 233 | Round 30/45 | PCC: 0.1309
+[04:35:08] Progress: random Seed 999 | Round 30/45 | PCC: 0.1310
+[04:35:23] Progress: random Seed 777 | Round 30/45 | PCC: 0.1187
+[04:35:34] Progress: random Seed 27 | Round 30/45 | PCC: 0.1200
+[04:36:48] Progress: random Seed 401 | Round 30/45 | PCC: 0.1384
+[04:39:07] Progress: spatial_min Seed 13 | Round 25/45 | PCC: 0.0958
+[04:40:06] Progress: spatial_min Seed 27 | Round 25/45 | PCC: 0.1157
+[04:41:04] Progress: invariance Seed 27 | Round 25/45 | PCC: 0.1344
+[04:41:51] Progress: invariance Seed 56 | Round 25/45 | PCC: 0.1607
+[04:41:53] Progress: invariance Seed 233 | Round 25/45 | PCC: 0.1404
+[04:41:54] Progress: random Seed 13 | Round 35/45 | PCC: 0.1391
+[04:41:59] Progress: random Seed 56 | Round 35/45 | PCC: 0.1318
+[04:42:00] Progress: invariance Seed 89 | Round 25/45 | PCC: 0.1413
+[04:42:02] Progress: invariance Seed 401 | Round 25/45 | PCC: 0.1468
+[04:42:02] Progress: invariance Seed 892 | Round 25/45 | PCC: 0.1400
+[04:42:06] Progress: invariance Seed 104 | Round 25/45 | PCC: 0.1158
+[04:42:24] Progress: random Seed 104 | Round 35/45 | PCC: 0.1415
+[04:42:33] Progress: random Seed 892 | Round 35/45 | PCC: 0.0779
+[04:42:36] Progress: invariance Seed 13 | Round 25/45 | PCC: 0.1421
+[04:42:40] Progress: invariance Seed 777 | Round 25/45 | PCC: 0.1557
+[04:43:01] Progress: random Seed 233 | Round 35/45 | PCC: 0.1354
+[04:43:21] Progress: random Seed 27 | Round 35/45 | PCC: 0.1345
+[04:43:49] Progress: random Seed 89 | Round 35/45 | PCC: 0.1241
+[04:44:16] Progress: invariance Seed 999 | Round 25/45 | PCC: 0.1860
+[04:45:02] Progress: random Seed 777 | Round 35/45 | PCC: 0.1171
+[04:46:40] Progress: random Seed 999 | Round 35/45 | PCC: 0.1425
+[04:50:06] Progress: random Seed 401 | Round 35/45 | PCC: 0.1508
+[04:51:01] Progress: invariance Seed 27 | Round 30/45 | PCC: 0.1454
+[04:51:35] Progress: spatial_min Seed 13 | Round 30/45 | PCC: 0.1118
+[04:51:44] Progress: random Seed 233 | Round 40/45 | PCC: 0.1329
+[04:51:49] Progress: invariance Seed 233 | Round 30/45 | PCC: 0.1471
+[04:51:58] Progress: invariance Seed 56 | Round 30/45 | PCC: 0.1505
+[04:52:01] Progress: random Seed 27 | Round 40/45 | PCC: 0.1333
+[04:52:10] Progress: random Seed 13 | Round 40/45 | PCC: 0.1490
+[04:52:16] Progress: random Seed 104 | Round 40/45 | PCC: 0.1398
+[04:52:22] Progress: invariance Seed 892 | Round 30/45 | PCC: 0.1304
+[04:52:30] Progress: uncertainty Seed 999 | Round 10/45 | PCC: 0.1019
+[04:52:58] Progress: invariance Seed 777 | Round 30/45 | PCC: 0.1247
+[04:53:00] Progress: invariance Seed 104 | Round 30/45 | PCC: 0.1184
+[04:53:14] Progress: invariance Seed 89 | Round 30/45 | PCC: 0.1821
+[04:53:34] Progress: random Seed 777 | Round 40/45 | PCC: 0.1287
+[04:53:55] Progress: random Seed 892 | Round 40/45 | PCC: 0.1505
+[04:54:12] Progress: random Seed 89 | Round 40/45 | PCC: 0.1653
+[04:54:14] Progress: invariance Seed 13 | Round 30/45 | PCC: 0.1519
+[04:54:18] Progress: spatial_min Seed 27 | Round 30/45 | PCC: 0.0999
+[04:54:22] Progress: invariance Seed 401 | Round 30/45 | PCC: 0.1853
+[04:54:48] Progress: uncertainty Seed 104 | Round 10/45 | PCC: 0.1101
+[04:55:12] Progress: uncertainty Seed 89 | Round 10/45 | PCC: 0.1262
+[04:55:15] Progress: uncertainty Seed 892 | Round 10/45 | PCC: 0.1366
+[04:55:34] Progress: invariance Seed 999 | Round 30/45 | PCC: 0.1776
+[04:55:52] Progress: uncertainty Seed 56 | Round 10/45 | PCC: 0.0651
+[04:56:10] Progress: uncertainty Seed 777 | Round 10/45 | PCC: 0.0919
+[04:56:38] Progress: random Seed 56 | Round 40/45 | PCC: 0.1187
+[04:56:54] Progress: uncertainty Seed 27 | Round 10/45 | PCC: 0.1263
+[04:57:25] Progress: random Seed 999 | Round 40/45 | PCC: 0.1247
+[04:57:43] Progress: uncertainty Seed 13 | Round 10/45 | PCC: 0.1283
+[04:58:57] Progress: uncertainty Seed 233 | Round 10/45 | PCC: 0.1126
+[05:01:07] Progress: uncertainty Seed 401 | Round 10/45 | PCC: 0.0989
+[05:01:31] Progress: random Seed 401 | Round 40/45 | PCC: 0.1252
+[05:01:51] Progress: random Seed 27 | Round 45/45 | PCC: 0.1327
+[05:01:51] FINISH: random Seed 27
+[05:01:51] START: spatial_min | Seed 56
+[05:02:04] Progress: random Seed 104 | Round 45/45 | PCC: 0.1394
+[05:02:04] FINISH: random Seed 104
+[05:02:04] START: spatial_min | Seed 89
+[05:02:10] Progress: spatial_min Seed 56 | Round 1/45 | PCC: 0.0201
+[05:02:22] Progress: invariance Seed 27 | Round 35/45 | PCC: 0.1415
+[05:02:23] Progress: spatial_min Seed 89 | Round 1/45 | PCC: 0.0604
+[05:03:01] Progress: random Seed 13 | Round 45/45 | PCC: 0.1350
+[05:03:01] FINISH: random Seed 13
+[05:03:01] START: spatial_min | Seed 104
+[05:03:05] Progress: spatial_min Seed 13 | Round 35/45 | PCC: 0.1588
+[05:03:21] Progress: spatial_min Seed 104 | Round 1/45 | PCC: 0.1013
+[05:03:45] Progress: random Seed 892 | Round 45/45 | PCC: 0.1496
+[05:03:45] FINISH: random Seed 892
+[05:03:45] START: spatial_min | Seed 233
+[05:04:02] Progress: spatial_min Seed 233 | Round 1/45 | PCC: 0.1129
+[05:04:24] Progress: invariance Seed 56 | Round 35/45 | PCC: 0.1719
+[05:05:38] Progress: spatial_min Seed 56 | Round 5/45 | PCC: 0.1054
+[05:05:46] Progress: random Seed 233 | Round 45/45 | PCC: 0.1591
+[05:05:46] FINISH: random Seed 233
+[05:05:46] START: spatial_min | Seed 401
+[05:06:03] Progress: spatial_min Seed 401 | Round 1/45 | PCC: 0.1058
+[05:06:09] Progress: spatial_min Seed 89 | Round 5/45 | PCC: 0.1118
+[05:06:09] Progress: invariance Seed 892 | Round 35/45 | PCC: 0.1594
+[05:06:12] Progress: invariance Seed 777 | Round 35/45 | PCC: 0.1365
+[05:06:14] Progress: invariance Seed 233 | Round 35/45 | PCC: 0.1262
+[05:06:39] Progress: random Seed 56 | Round 45/45 | PCC: 0.1209
+[05:06:39] FINISH: random Seed 56
+[05:06:39] START: spatial_min | Seed 777
+[05:06:53] Progress: spatial_min Seed 104 | Round 5/45 | PCC: 0.1229
+[05:06:59] Progress: spatial_min Seed 777 | Round 1/45 | PCC: 0.1081
+[05:07:23] Progress: invariance Seed 104 | Round 35/45 | PCC: 0.1736
+[05:07:29] Progress: invariance Seed 13 | Round 35/45 | PCC: 0.1449
+[05:07:31] Progress: spatial_min Seed 233 | Round 5/45 | PCC: 0.1231
+[05:09:06] Progress: invariance Seed 89 | Round 35/45 | PCC: 0.1336
+[05:09:37] Progress: spatial_min Seed 401 | Round 5/45 | PCC: 0.1107
+[05:09:50] Progress: random Seed 777 | Round 45/45 | PCC: 0.1350
+[05:09:50] FINISH: random Seed 777
+[05:09:50] START: spatial_min | Seed 892
+[05:10:09] Progress: spatial_min Seed 892 | Round 1/45 | PCC: 0.0875
+[05:10:40] Progress: spatial_min Seed 777 | Round 5/45 | PCC: 0.1226
+[05:10:43] Progress: invariance Seed 999 | Round 35/45 | PCC: 0.1669
+[05:10:53] Progress: spatial_min Seed 27 | Round 35/45 | PCC: 0.1602
+[05:11:10] Progress: spatial_min Seed 56 | Round 10/45 | PCC: 0.1061
+[05:11:20] Progress: random Seed 89 | Round 45/45 | PCC: 0.1313
+[05:11:20] FINISH: random Seed 89
+[05:11:20] START: spatial_min | Seed 999
+[05:11:21] Progress: invariance Seed 401 | Round 35/45 | PCC: 0.1362
+[05:11:37] Progress: random Seed 401 | Round 45/45 | PCC: 0.1279
+[05:11:37] FINISH: random Seed 401
+[05:11:37] START: kmeans_core | Seed 13
+[05:11:39] Progress: spatial_min Seed 999 | Round 1/45 | PCC: 0.1086
+[05:11:54] Progress: kmeans_core Seed 13 | Round 1/45 | PCC: 0.1081
+[05:12:25] Progress: spatial_min Seed 89 | Round 10/45 | PCC: 0.1100
+[05:12:27] Progress: spatial_min Seed 104 | Round 10/45 | PCC: 0.1067
+[05:13:05] Progress: spatial_min Seed 233 | Round 10/45 | PCC: 0.1106
+[05:13:31] Progress: random Seed 999 | Round 45/45 | PCC: 0.1764
+[05:13:31] FINISH: random Seed 999
+[05:13:31] START: kmeans_core | Seed 27
+[05:13:35] Progress: spatial_min Seed 892 | Round 5/45 | PCC: 0.1381
+[05:13:44] Progress: kmeans_core Seed 13 | Round 5/45 | PCC: 0.1312
+[05:13:51] Progress: kmeans_core Seed 27 | Round 1/45 | PCC: 0.1171
+[05:15:01] Progress: spatial_min Seed 401 | Round 10/45 | PCC: 0.1237
+[05:15:11] Progress: spatial_min Seed 999 | Round 5/45 | PCC: 0.1251
+[05:15:29] Progress: invariance Seed 27 | Round 40/45 | PCC: 0.1504
+[05:15:39] Progress: kmeans_core Seed 27 | Round 5/45 | PCC: 0.1187
+[05:16:21] Progress: spatial_min Seed 777 | Round 10/45 | PCC: 0.1076
+[05:17:04] Progress: kmeans_core Seed 13 | Round 10/45 | PCC: 0.1147
+[05:17:47] Progress: spatial_min Seed 56 | Round 15/45 | PCC: 0.1216
+[05:18:03] Progress: uncertainty Seed 999 | Round 15/45 | PCC: 0.1351
+[05:18:51] Progress: spatial_min Seed 104 | Round 15/45 | PCC: 0.1167
+[05:18:51] Progress: kmeans_core Seed 27 | Round 10/45 | PCC: 0.1093
+[05:18:58] Progress: spatial_min Seed 892 | Round 10/45 | PCC: 0.1227
+[05:19:34] Progress: spatial_min Seed 233 | Round 15/45 | PCC: 0.1227
+[05:19:46] Progress: invariance Seed 233 | Round 40/45 | PCC: 0.1428
+[05:19:49] Progress: spatial_min Seed 13 | Round 40/45 | PCC: 0.1268
+[05:19:55] Progress: spatial_min Seed 89 | Round 15/45 | PCC: 0.0956
+[05:20:27] Progress: uncertainty Seed 892 | Round 15/45 | PCC: 0.1515
+[05:21:02] Progress: invariance Seed 777 | Round 40/45 | PCC: 0.1632
+[05:21:20] Progress: invariance Seed 892 | Round 40/45 | PCC: 0.1886
+[05:21:21] Progress: kmeans_core Seed 13 | Round 15/45 | PCC: 0.1303
+[05:21:22] Progress: spatial_min Seed 401 | Round 15/45 | PCC: 0.0890
+[05:21:26] Progress: invariance Seed 13 | Round 40/45 | PCC: 0.1617
+[05:21:40] Progress: invariance Seed 56 | Round 40/45 | PCC: 0.1751
+[05:21:42] Progress: uncertainty Seed 89 | Round 15/45 | PCC: 0.1289
+[05:22:15] Progress: spatial_min Seed 999 | Round 10/45 | PCC: 0.1394
+[05:22:44] Progress: uncertainty Seed 56 | Round 15/45 | PCC: 0.1320
+[05:22:45] Progress: invariance Seed 999 | Round 40/45 | PCC: 0.1204
+[05:23:06] Progress: spatial_min Seed 777 | Round 15/45 | PCC: 0.1124
+[05:23:06] Progress: kmeans_core Seed 27 | Round 15/45 | PCC: 0.1128
+[05:23:28] Progress: uncertainty Seed 777 | Round 15/45 | PCC: 0.1157
+[05:23:50] Progress: uncertainty Seed 13 | Round 15/45 | PCC: 0.1382
+[05:24:44] Progress: uncertainty Seed 27 | Round 15/45 | PCC: 0.1361
+[05:24:50] Progress: uncertainty Seed 104 | Round 15/45 | PCC: 0.1166
+[05:25:00] Progress: invariance Seed 104 | Round 40/45 | PCC: 0.1938
+[05:25:29] Progress: spatial_min Seed 56 | Round 20/45 | PCC: 0.1009
+[05:25:42] Progress: uncertainty Seed 233 | Round 15/45 | PCC: 0.1305
+[05:25:52] Progress: spatial_min Seed 892 | Round 15/45 | PCC: 0.1139
+[05:26:03] Progress: invariance Seed 401 | Round 40/45 | PCC: 0.1721
+[05:26:22] Progress: spatial_min Seed 104 | Round 20/45 | PCC: 0.0978
+[05:26:39] Progress: invariance Seed 89 | Round 40/45 | PCC: 0.1692
+[05:26:47] Progress: kmeans_core Seed 13 | Round 20/45 | PCC: 0.1425
+[05:27:07] Progress: spatial_min Seed 233 | Round 20/45 | PCC: 0.1198
+[05:27:50] Progress: spatial_min Seed 89 | Round 20/45 | PCC: 0.1025
+[05:28:27] Progress: kmeans_core Seed 27 | Round 20/45 | PCC: 0.1135
+[05:28:54] Progress: spatial_min Seed 999 | Round 15/45 | PCC: 0.1116
+[05:28:55] Progress: spatial_min Seed 401 | Round 20/45 | PCC: 0.1136
+[05:28:59] Progress: uncertainty Seed 401 | Round 15/45 | PCC: 0.1332
+[05:29:45] Progress: invariance Seed 27 | Round 45/45 | PCC: 0.1389
+[05:29:45] FINISH: invariance Seed 27
+[05:29:45] START: kmeans_core | Seed 56
+[05:30:03] Progress: kmeans_core Seed 56 | Round 1/45 | PCC: 0.0201
+[05:30:36] Progress: spatial_min Seed 27 | Round 40/45 | PCC: 0.1723
+[05:31:47] Progress: kmeans_core Seed 56 | Round 5/45 | PCC: 0.0976
+[05:32:08] Progress: spatial_min Seed 777 | Round 20/45 | PCC: 0.1221
+[05:33:10] Progress: kmeans_core Seed 13 | Round 25/45 | PCC: 0.1400
+[05:33:48] Progress: spatial_min Seed 56 | Round 25/45 | PCC: 0.1063
+[05:34:18] Progress: invariance Seed 233 | Round 45/45 | PCC: 0.1578
+[05:34:18] FINISH: invariance Seed 233
+[05:34:19] START: kmeans_core | Seed 89
+[05:34:36] Progress: kmeans_core Seed 89 | Round 1/45 | PCC: 0.0604
+[05:34:50] Progress: kmeans_core Seed 27 | Round 25/45 | PCC: 0.1224
+[05:34:50] Progress: spatial_min Seed 104 | Round 25/45 | PCC: 0.1110
+[05:34:56] Progress: kmeans_core Seed 56 | Round 10/45 | PCC: 0.1197
+[05:35:55] Progress: spatial_min Seed 892 | Round 20/45 | PCC: 0.1250
+[05:36:16] Progress: kmeans_core Seed 89 | Round 5/45 | PCC: 0.1087
+[05:36:39] Progress: spatial_min Seed 999 | Round 20/45 | PCC: 0.1122
+[05:37:08] Progress: spatial_min Seed 233 | Round 25/45 | PCC: 0.1157
+[05:37:26] Progress: spatial_min Seed 13 | Round 45/45 | PCC: 0.1682
+[05:37:26] FINISH: spatial_min Seed 13
+[05:37:27] START: kmeans_core | Seed 104
+[05:37:46] Progress: kmeans_core Seed 104 | Round 1/45 | PCC: 0.1013
+[05:38:53] Progress: invariance Seed 777 | Round 45/45 | PCC: 0.1822
+[05:38:53] FINISH: invariance Seed 777
+[05:38:53] START: kmeans_core | Seed 233
+[05:38:58] Progress: kmeans_core Seed 56 | Round 15/45 | PCC: 0.1160
+[05:39:09] Progress: kmeans_core Seed 233 | Round 1/45 | PCC: 0.1129
+[05:39:22] Progress: kmeans_core Seed 89 | Round 10/45 | PCC: 0.1162
+[05:39:32] Progress: kmeans_core Seed 104 | Round 5/45 | PCC: 0.1238
+[05:39:37] Progress: invariance Seed 13 | Round 45/45 | PCC: 0.1635
+[05:39:37] FINISH: invariance Seed 13
+[05:39:37] START: kmeans_core | Seed 401
+[05:39:50] Progress: spatial_min Seed 89 | Round 25/45 | PCC: 0.1526
+[05:39:56] Progress: kmeans_core Seed 401 | Round 1/45 | PCC: 0.1058
+[05:40:17] Progress: invariance Seed 892 | Round 45/45 | PCC: 0.1928
+[05:40:17] FINISH: invariance Seed 892
+[05:40:17] START: kmeans_core | Seed 777
+[05:40:22] Progress: kmeans_core Seed 13 | Round 30/45 | PCC: 0.1386
+[05:40:38] Progress: kmeans_core Seed 777 | Round 1/45 | PCC: 0.1081
+[05:40:57] Progress: kmeans_core Seed 233 | Round 5/45 | PCC: 0.1271
+[05:41:22] Progress: invariance Seed 56 | Round 45/45 | PCC: 0.1381
+[05:41:23] FINISH: invariance Seed 56
+[05:41:23] START: kmeans_core | Seed 892
+[05:41:40] Progress: kmeans_core Seed 892 | Round 1/45 | PCC: 0.0875
+[05:41:46] Progress: invariance Seed 104 | Round 45/45 | PCC: 0.1051
+[05:41:46] FINISH: invariance Seed 104
+[05:41:46] START: kmeans_core | Seed 999
+[05:41:46] Progress: kmeans_core Seed 401 | Round 5/45 | PCC: 0.1067
+[05:42:04] Progress: kmeans_core Seed 27 | Round 30/45 | PCC: 0.1263
+[05:42:07] Progress: kmeans_core Seed 999 | Round 1/45 | PCC: 0.1086
+[05:42:25] Progress: kmeans_core Seed 777 | Round 5/45 | PCC: 0.0986
+[05:42:45] Progress: invariance Seed 401 | Round 45/45 | PCC: 0.1868
+[05:42:45] FINISH: invariance Seed 401
+[05:42:45] START: adversarial_batch | Seed 13
+[05:42:47] Progress: kmeans_core Seed 104 | Round 10/45 | PCC: 0.1325
+[05:42:54] Progress: spatial_min Seed 777 | Round 25/45 | PCC: 0.1238
+[05:42:57] Progress: spatial_min Seed 401 | Round 25/45 | PCC: 0.0977
+[05:43:07] Progress: adversarial_batch Seed 13 | Round 1/45 | PCC: 0.1081
+[05:43:21] Progress: kmeans_core Seed 89 | Round 15/45 | PCC: 0.1212
+[05:43:22] Progress: kmeans_core Seed 892 | Round 5/45 | PCC: 0.1310
+[05:43:38] Progress: invariance Seed 999 | Round 45/45 | PCC: 0.1872
+[05:43:38] FINISH: invariance Seed 999
+[05:43:38] START: adversarial_batch | Seed 27
+[05:43:56] Progress: kmeans_core Seed 56 | Round 20/45 | PCC: 0.1347
+[05:43:56] Progress: invariance Seed 89 | Round 45/45 | PCC: 0.1785
+[05:43:56] FINISH: invariance Seed 89
+[05:43:56] START: adversarial_batch | Seed 56
+[05:43:59] Progress: kmeans_core Seed 999 | Round 5/45 | PCC: 0.1246
+[05:44:02] Progress: adversarial_batch Seed 27 | Round 1/45 | PCC: 0.1171
+[05:44:07] Progress: kmeans_core Seed 233 | Round 10/45 | PCC: 0.1224
+[05:44:17] Progress: adversarial_batch Seed 56 | Round 1/45 | PCC: 0.0201
+[05:44:23] Progress: uncertainty Seed 999 | Round 20/45 | PCC: 0.1236
+[05:45:05] Progress: kmeans_core Seed 401 | Round 10/45 | PCC: 0.1230
+[05:45:36] Progress: kmeans_core Seed 777 | Round 10/45 | PCC: 0.1146
+[05:46:30] Progress: kmeans_core Seed 892 | Round 10/45 | PCC: 0.1294
+[05:46:43] Progress: uncertainty Seed 892 | Round 20/45 | PCC: 0.1297
+[05:47:02] Progress: kmeans_core Seed 104 | Round 15/45 | PCC: 0.1334
+[05:47:19] Progress: adversarial_batch Seed 13 | Round 5/45 | PCC: 0.1070
+[05:47:20] Progress: kmeans_core Seed 999 | Round 10/45 | PCC: 0.0995
+[05:47:53] Progress: spatial_min Seed 892 | Round 25/45 | PCC: 0.1188
+[05:48:00] Progress: adversarial_batch Seed 56 | Round 5/45 | PCC: 0.1259
+[05:48:10] Progress: kmeans_core Seed 89 | Round 20/45 | PCC: 0.1183
+[05:48:16] Progress: adversarial_batch Seed 27 | Round 5/45 | PCC: 0.0995
+[05:48:23] Progress: kmeans_core Seed 233 | Round 15/45 | PCC: 0.1332
+[05:48:26] Progress: spatial_min Seed 56 | Round 30/45 | PCC: 0.1527
+[05:48:39] Progress: spatial_min Seed 233 | Round 30/45 | PCC: 0.1276
+[05:48:51] Progress: spatial_min Seed 999 | Round 25/45 | PCC: 0.1486
+[05:49:03] Progress: uncertainty Seed 89 | Round 20/45 | PCC: 0.1405
+[05:49:25] Progress: kmeans_core Seed 401 | Round 15/45 | PCC: 0.1267
+[05:49:33] Progress: spatial_min Seed 27 | Round 45/45 | PCC: 0.1670
+[05:49:33] FINISH: spatial_min Seed 27
+[05:49:33] START: adversarial_batch | Seed 89
+[05:49:46] Progress: kmeans_core Seed 777 | Round 15/45 | PCC: 0.1191
+[05:49:54] Progress: adversarial_batch Seed 89 | Round 1/45 | PCC: 0.0604
+[05:49:55] Progress: kmeans_core Seed 56 | Round 25/45 | PCC: 0.1349
+[05:50:02] Progress: kmeans_core Seed 27 | Round 35/45 | PCC: 0.1276
+[05:50:07] Progress: uncertainty Seed 13 | Round 20/45 | PCC: 0.1330
+[05:50:31] Progress: kmeans_core Seed 13 | Round 35/45 | PCC: 0.1407
+[05:50:33] Progress: uncertainty Seed 777 | Round 20/45 | PCC: 0.1257
+[05:50:35] Progress: spatial_min Seed 89 | Round 30/45 | PCC: 0.1447
+[05:50:36] Progress: kmeans_core Seed 892 | Round 15/45 | PCC: 0.1253
+[05:50:55] Progress: spatial_min Seed 104 | Round 30/45 | PCC: 0.1572
+[05:51:38] Progress: kmeans_core Seed 999 | Round 15/45 | PCC: 0.0994
+[05:51:47] Progress: uncertainty Seed 56 | Round 20/45 | PCC: 0.1369
+[05:52:13] Progress: kmeans_core Seed 104 | Round 20/45 | PCC: 0.1096
+[05:52:21] Progress: uncertainty Seed 27 | Round 20/45 | PCC: 0.1355
+[05:53:28] Progress: adversarial_batch Seed 89 | Round 5/45 | PCC: 0.1140
+[05:53:28] Progress: kmeans_core Seed 233 | Round 20/45 | PCC: 0.1198
+[05:53:35] Progress: adversarial_batch Seed 13 | Round 10/45 | PCC: 0.1348
+[05:53:36] Progress: adversarial_batch Seed 56 | Round 10/45 | PCC: 0.1259
+[05:53:56] Progress: adversarial_batch Seed 27 | Round 10/45 | PCC: 0.0797
+[05:53:59] Progress: kmeans_core Seed 89 | Round 25/45 | PCC: 0.1315
+[05:54:40] Progress: kmeans_core Seed 401 | Round 20/45 | PCC: 0.1277
+[05:54:50] Progress: kmeans_core Seed 777 | Round 20/45 | PCC: 0.1194
+[05:55:38] Progress: uncertainty Seed 401 | Round 20/45 | PCC: 0.1139
+[05:55:43] Progress: kmeans_core Seed 892 | Round 20/45 | PCC: 0.1342
+[05:56:34] Progress: spatial_min Seed 401 | Round 30/45 | PCC: 0.1446
+[05:56:40] Progress: spatial_min Seed 777 | Round 30/45 | PCC: 0.1561
+[05:56:43] Progress: kmeans_core Seed 999 | Round 20/45 | PCC: 0.1228
+[05:56:51] Progress: kmeans_core Seed 56 | Round 30/45 | PCC: 0.1324
+[05:57:07] Progress: uncertainty Seed 104 | Round 20/45 | PCC: 0.1474
+[05:58:36] Progress: kmeans_core Seed 104 | Round 25/45 | PCC: 0.1341
+[05:58:58] Progress: kmeans_core Seed 27 | Round 40/45 | PCC: 0.1246
+[05:59:07] Progress: adversarial_batch Seed 89 | Round 10/45 | PCC: 0.1167
+[05:59:32] Progress: kmeans_core Seed 13 | Round 40/45 | PCC: 0.1432
+[05:59:39] Progress: kmeans_core Seed 233 | Round 25/45 | PCC: 0.1372
+[05:59:46] Progress: uncertainty Seed 233 | Round 20/45 | PCC: 0.1257
+[06:00:26] Progress: adversarial_batch Seed 56 | Round 15/45 | PCC: 0.1201
+[06:00:36] Progress: adversarial_batch Seed 27 | Round 15/45 | PCC: 0.1105
+[06:00:41] Progress: kmeans_core Seed 89 | Round 30/45 | PCC: 0.1389
+[06:00:45] Progress: kmeans_core Seed 401 | Round 25/45 | PCC: 0.1152
+[06:00:54] Progress: kmeans_core Seed 777 | Round 25/45 | PCC: 0.1240
+[06:01:17] Progress: adversarial_batch Seed 13 | Round 15/45 | PCC: 0.1483
+[06:01:45] Progress: kmeans_core Seed 892 | Round 25/45 | PCC: 0.1465
+[06:01:57] Progress: spatial_min Seed 999 | Round 30/45 | PCC: 0.1471
+[06:02:44] Progress: spatial_min Seed 892 | Round 30/45 | PCC: 0.1651
+[06:02:54] Progress: kmeans_core Seed 999 | Round 25/45 | PCC: 0.1321
+[06:04:21] Progress: spatial_min Seed 56 | Round 35/45 | PCC: 0.1507
+[06:04:37] Progress: kmeans_core Seed 56 | Round 35/45 | PCC: 0.1303
+[06:05:20] Progress: spatial_min Seed 89 | Round 35/45 | PCC: 0.1567
+[06:05:50] Progress: spatial_min Seed 233 | Round 35/45 | PCC: 0.1717
+[06:05:54] Progress: adversarial_batch Seed 89 | Round 15/45 | PCC: 0.1119
+[06:06:01] Progress: kmeans_core Seed 104 | Round 30/45 | PCC: 0.1320
+[06:06:30] Progress: kmeans_core Seed 233 | Round 30/45 | PCC: 0.1345
+[06:07:41] Progress: kmeans_core Seed 401 | Round 30/45 | PCC: 0.1184
+[06:08:13] Progress: adversarial_batch Seed 27 | Round 20/45 | PCC: 0.1148
+[06:08:16] Progress: kmeans_core Seed 89 | Round 35/45 | PCC: 0.1334
+[06:08:29] Progress: adversarial_batch Seed 56 | Round 20/45 | PCC: 0.1092
+[06:08:36] Progress: kmeans_core Seed 777 | Round 30/45 | PCC: 0.1171
+[06:09:15] Progress: kmeans_core Seed 13 | Round 45/45 | PCC: 0.1401
+[06:09:16] FINISH: kmeans_core Seed 13
+[06:09:16] START: adversarial_batch | Seed 104
+[06:09:36] Progress: adversarial_batch Seed 104 | Round 1/45 | PCC: 0.1013
+[06:09:45] Progress: adversarial_batch Seed 13 | Round 20/45 | PCC: 0.1404
+[06:09:47] Progress: spatial_min Seed 104 | Round 35/45 | PCC: 0.1667
+[06:10:11] Progress: kmeans_core Seed 999 | Round 30/45 | PCC: 0.1392
+[06:10:11] Progress: kmeans_core Seed 27 | Round 45/45 | PCC: 0.1205
+[06:10:11] FINISH: kmeans_core Seed 27
+[06:10:11] START: adversarial_batch | Seed 233
+[06:10:30] Progress: adversarial_batch Seed 233 | Round 1/45 | PCC: 0.1129
+[06:10:58] Progress: kmeans_core Seed 892 | Round 30/45 | PCC: 0.1680
+[06:12:25] Progress: spatial_min Seed 777 | Round 35/45 | PCC: 0.1714
+[06:12:49] Progress: uncertainty Seed 999 | Round 25/45 | PCC: 0.1335
+[06:13:09] Progress: adversarial_batch Seed 104 | Round 5/45 | PCC: 0.1218
+[06:13:34] Progress: spatial_min Seed 401 | Round 35/45 | PCC: 0.1650
+[06:13:39] Progress: kmeans_core Seed 56 | Round 40/45 | PCC: 0.1269
+[06:13:51] Progress: adversarial_batch Seed 89 | Round 20/45 | PCC: 0.1131
+[06:14:04] Progress: adversarial_batch Seed 233 | Round 5/45 | PCC: 0.0403
+[06:14:11] Progress: kmeans_core Seed 104 | Round 35/45 | PCC: 0.1276
+[06:14:15] Progress: kmeans_core Seed 233 | Round 35/45 | PCC: 0.1287
+[06:15:44] Progress: kmeans_core Seed 401 | Round 35/45 | PCC: 0.1245
+[06:16:24] Progress: uncertainty Seed 13 | Round 25/45 | PCC: 0.1259
+[06:16:27] Progress: uncertainty Seed 89 | Round 25/45 | PCC: 0.1380
+[06:16:28] Progress: kmeans_core Seed 777 | Round 35/45 | PCC: 0.1222
+[06:16:57] Progress: adversarial_batch Seed 27 | Round 25/45 | PCC: 0.1246
+[06:16:57] Progress: kmeans_core Seed 89 | Round 40/45 | PCC: 0.1324
+[06:17:02] Progress: uncertainty Seed 892 | Round 25/45 | PCC: 0.1576
+[06:17:21] Progress: uncertainty Seed 777 | Round 25/45 | PCC: 0.1364
+[06:17:24] Progress: spatial_min Seed 999 | Round 35/45 | PCC: 0.1704
+[06:18:17] Progress: kmeans_core Seed 999 | Round 35/45 | PCC: 0.1302
+[06:18:34] Progress: adversarial_batch Seed 104 | Round 10/45 | PCC: 0.1170
+[06:18:43] Progress: adversarial_batch Seed 13 | Round 25/45 | PCC: 0.1143
+[06:18:55] Progress: kmeans_core Seed 892 | Round 35/45 | PCC: 0.1563
+[06:19:29] Progress: adversarial_batch Seed 233 | Round 10/45 | PCC: 0.1167
+[06:19:38] Progress: adversarial_batch Seed 56 | Round 25/45 | PCC: 0.1138
+[06:20:08] Progress: spatial_min Seed 89 | Round 40/45 | PCC: 0.1242
+[06:20:45] Progress: spatial_min Seed 892 | Round 35/45 | PCC: 0.1629
+[06:22:47] Progress: adversarial_batch Seed 89 | Round 25/45 | PCC: 0.1258
+[06:23:07] Progress: kmeans_core Seed 104 | Round 40/45 | PCC: 0.1496
+[06:23:46] Progress: kmeans_core Seed 56 | Round 45/45 | PCC: 0.1152
+[06:23:46] FINISH: kmeans_core Seed 56
+[06:23:46] START: adversarial_batch | Seed 401
+[06:24:07] Progress: adversarial_batch Seed 401 | Round 1/45 | PCC: 0.1058
+[06:24:22] Progress: uncertainty Seed 104 | Round 25/45 | PCC: 0.1331
+[06:24:34] Progress: kmeans_core Seed 401 | Round 40/45 | PCC: 0.1236
+[06:25:10] Progress: uncertainty Seed 56 | Round 25/45 | PCC: 0.1402
+[06:25:11] Progress: adversarial_batch Seed 104 | Round 15/45 | PCC: 0.1269
+[06:25:22] Progress: kmeans_core Seed 233 | Round 40/45 | PCC: 0.1204
+[06:25:32] Progress: kmeans_core Seed 777 | Round 40/45 | PCC: 0.1267
+[06:25:45] Progress: uncertainty Seed 27 | Round 25/45 | PCC: 0.1154
+[06:25:50] Progress: adversarial_batch Seed 233 | Round 15/45 | PCC: 0.1076
+[06:25:51] Progress: spatial_min Seed 777 | Round 40/45 | PCC: 0.1511
+[06:25:59] Progress: uncertainty Seed 401 | Round 25/45 | PCC: 0.1341
+[06:26:10] Progress: spatial_min Seed 56 | Round 40/45 | PCC: 0.1581
+[06:26:26] Progress: kmeans_core Seed 89 | Round 45/45 | PCC: 0.1283
+[06:26:26] FINISH: kmeans_core Seed 89
+[06:26:26] START: adversarial_batch | Seed 777
+[06:26:46] Progress: adversarial_batch Seed 777 | Round 1/45 | PCC: 0.1081
+[06:26:49] Progress: spatial_min Seed 233 | Round 40/45 | PCC: 0.1629
+[06:26:52] Progress: adversarial_batch Seed 27 | Round 30/45 | PCC: 0.1193
+[06:27:48] Progress: kmeans_core Seed 892 | Round 40/45 | PCC: 0.1471
+[06:27:49] Progress: adversarial_batch Seed 401 | Round 5/45 | PCC: 0.1033
+[06:28:22] Progress: kmeans_core Seed 999 | Round 40/45 | PCC: 0.1389
+[06:28:29] Progress: uncertainty Seed 233 | Round 25/45 | PCC: 0.1346
+[06:28:34] Progress: spatial_min Seed 104 | Round 40/45 | PCC: 0.1549
+[06:30:18] Progress: adversarial_batch Seed 777 | Round 5/45 | PCC: 0.1187
+[06:30:28] Progress: adversarial_batch Seed 56 | Round 30/45 | PCC: 0.0928
+[06:31:46] Progress: adversarial_batch Seed 13 | Round 30/45 | PCC: 0.1323
+[06:32:07] Progress: spatial_min Seed 999 | Round 40/45 | PCC: 0.1172
+[06:32:47] Progress: adversarial_batch Seed 104 | Round 20/45 | PCC: 0.1364
+[06:33:09] Progress: adversarial_batch Seed 89 | Round 30/45 | PCC: 0.1166
+[06:33:26] Progress: adversarial_batch Seed 233 | Round 20/45 | PCC: 0.1074
+[06:33:36] Progress: spatial_min Seed 401 | Round 40/45 | PCC: 0.1664
+[06:33:40] Progress: adversarial_batch Seed 401 | Round 10/45 | PCC: 0.1055
+[06:34:42] Progress: kmeans_core Seed 233 | Round 45/45 | PCC: 0.1383
+[06:34:42] FINISH: kmeans_core Seed 233
+[06:34:42] START: adversarial_batch | Seed 892
+[06:35:04] Progress: adversarial_batch Seed 892 | Round 1/45 | PCC: 0.0875
+[06:35:29] Progress: spatial_min Seed 892 | Round 40/45 | PCC: 0.1722
+[06:35:32] Progress: kmeans_core Seed 401 | Round 45/45 | PCC: 0.1521
+[06:35:32] FINISH: kmeans_core Seed 401
+[06:35:32] START: adversarial_batch | Seed 999
+[06:35:34] Progress: kmeans_core Seed 777 | Round 45/45 | PCC: 0.1253
+[06:35:34] FINISH: kmeans_core Seed 777
+[06:35:50] Progress: adversarial_batch Seed 777 | Round 10/45 | PCC: 0.1252
+[06:35:54] Progress: adversarial_batch Seed 999 | Round 1/45 | PCC: 0.1086
+[06:36:45] Progress: kmeans_core Seed 104 | Round 45/45 | PCC: 0.1273
+[06:36:45] FINISH: kmeans_core Seed 104
+[06:38:14] Progress: kmeans_core Seed 999 | Round 45/45 | PCC: 0.1250
+[06:38:14] FINISH: kmeans_core Seed 999
+[06:38:38] Progress: adversarial_batch Seed 892 | Round 5/45 | PCC: 0.1480
+[06:38:59] Progress: kmeans_core Seed 892 | Round 45/45 | PCC: 0.1631
+[06:38:59] FINISH: kmeans_core Seed 892
+[06:39:21] Progress: spatial_min Seed 89 | Round 45/45 | PCC: 0.1649
+[06:39:21] FINISH: spatial_min Seed 89
+[06:39:23] Progress: adversarial_batch Seed 999 | Round 5/45 | PCC: 0.0879
+[06:40:17] Progress: adversarial_batch Seed 27 | Round 35/45 | PCC: 0.1360
+[06:40:25] Progress: adversarial_batch Seed 401 | Round 15/45 | PCC: 0.1306
+[06:40:29] Progress: spatial_min Seed 56 | Round 45/45 | PCC: 0.1184
+[06:40:29] FINISH: spatial_min Seed 56
+[06:41:35] Progress: adversarial_batch Seed 104 | Round 25/45 | PCC: 0.1145
+[06:41:36] Progress: adversarial_batch Seed 777 | Round 15/45 | PCC: 0.0364
+[06:41:49] Progress: adversarial_batch Seed 233 | Round 25/45 | PCC: 0.0854
+[06:42:19] Progress: uncertainty Seed 13 | Round 30/45 | PCC: 0.1434
+[06:42:26] Progress: adversarial_batch Seed 13 | Round 35/45 | PCC: 0.1153
+[06:42:26] Progress: uncertainty Seed 999 | Round 30/45 | PCC: 0.1545
+[06:43:06] Progress: uncertainty Seed 89 | Round 30/45 | PCC: 0.1332
+[06:43:53] Progress: adversarial_batch Seed 892 | Round 10/45 | PCC: 0.1353
+[06:43:54] Progress: uncertainty Seed 777 | Round 30/45 | PCC: 0.1258
+[06:44:11] Progress: adversarial_batch Seed 56 | Round 35/45 | PCC: 0.1664
+[06:44:25] Progress: adversarial_batch Seed 89 | Round 35/45 | PCC: 0.0640
+[06:44:33] Progress: adversarial_batch Seed 999 | Round 10/45 | PCC: 0.1144
+[06:44:40] Progress: uncertainty Seed 892 | Round 30/45 | PCC: 0.1561
+[06:46:55] Progress: adversarial_batch Seed 401 | Round 20/45 | PCC: 0.0999
+[06:47:02] Progress: spatial_min Seed 777 | Round 45/45 | PCC: 0.1681
+[06:47:02] FINISH: spatial_min Seed 777
+[06:47:03] Progress: spatial_min Seed 104 | Round 45/45 | PCC: 0.1720
+[06:47:03] FINISH: spatial_min Seed 104
+[06:47:16] Progress: spatial_min Seed 233 | Round 45/45 | PCC: 0.1727
+[06:47:16] FINISH: spatial_min Seed 233
+[06:47:38] Progress: spatial_min Seed 401 | Round 45/45 | PCC: 0.1420
+[06:47:38] FINISH: spatial_min Seed 401
+[06:47:54] Progress: adversarial_batch Seed 777 | Round 20/45 | PCC: 0.1118
+[06:48:31] Progress: spatial_min Seed 999 | Round 45/45 | PCC: 0.1068
+[06:48:31] FINISH: spatial_min Seed 999
+[06:49:34] Progress: uncertainty Seed 104 | Round 30/45 | PCC: 0.1361
+[06:49:42] Progress: adversarial_batch Seed 27 | Round 40/45 | PCC: 0.1226
+[06:49:47] Progress: adversarial_batch Seed 892 | Round 15/45 | PCC: 0.1357
+[06:49:56] Progress: adversarial_batch Seed 999 | Round 15/45 | PCC: 0.1262
+[06:50:18] Progress: adversarial_batch Seed 104 | Round 30/45 | PCC: 0.1184
+[06:50:57] Progress: adversarial_batch Seed 233 | Round 30/45 | PCC: 0.1269
+[06:51:50] Progress: spatial_min Seed 892 | Round 45/45 | PCC: 0.1196
+[06:51:50] FINISH: spatial_min Seed 892
+[06:52:18] Progress: uncertainty Seed 401 | Round 30/45 | PCC: 0.1386
+[06:52:20] Progress: uncertainty Seed 233 | Round 30/45 | PCC: 0.1235
+[06:53:29] Progress: adversarial_batch Seed 401 | Round 25/45 | PCC: 0.1214
+[06:53:40] Progress: uncertainty Seed 27 | Round 30/45 | PCC: 0.1376
+[06:53:51] Progress: adversarial_batch Seed 13 | Round 40/45 | PCC: 0.1326
+[06:55:26] Progress: uncertainty Seed 56 | Round 30/45 | PCC: 0.1093
+[06:55:41] Progress: adversarial_batch Seed 999 | Round 20/45 | PCC: 0.1320
+[06:55:52] Progress: adversarial_batch Seed 892 | Round 20/45 | PCC: 0.1320
+[06:55:54] Progress: adversarial_batch Seed 89 | Round 40/45 | PCC: 0.1577
+[06:56:27] Progress: adversarial_batch Seed 777 | Round 25/45 | PCC: 0.1312
+[06:58:33] Progress: adversarial_batch Seed 104 | Round 35/45 | PCC: 0.1143
+[06:59:14] Progress: adversarial_batch Seed 56 | Round 40/45 | PCC: 0.1643
+[07:00:09] Progress: adversarial_batch Seed 27 | Round 45/45 | PCC: 0.1345
+[07:00:09] FINISH: adversarial_batch Seed 27
+[07:00:14] Progress: adversarial_batch Seed 233 | Round 35/45 | PCC: 0.1227
+[07:00:33] Progress: adversarial_batch Seed 401 | Round 30/45 | PCC: 0.0991
+[07:02:14] Progress: adversarial_batch Seed 999 | Round 25/45 | PCC: 0.1237
+[07:03:36] Progress: adversarial_batch Seed 777 | Round 30/45 | PCC: 0.1401
+[07:03:38] Progress: uncertainty Seed 89 | Round 35/45 | PCC: 0.1256
+[07:04:25] Progress: adversarial_batch Seed 892 | Round 25/45 | PCC: 0.1261
+[07:04:29] Progress: adversarial_batch Seed 13 | Round 45/45 | PCC: 0.1307
+[07:04:29] FINISH: adversarial_batch Seed 13
+[07:04:51] Progress: uncertainty Seed 999 | Round 35/45 | PCC: 0.1279
+[07:05:38] Progress: uncertainty Seed 777 | Round 35/45 | PCC: 0.1303
+[07:05:42] Progress: uncertainty Seed 13 | Round 35/45 | PCC: 0.1453
+[07:06:05] Progress: uncertainty Seed 892 | Round 35/45 | PCC: 0.1611
+[07:09:08] Progress: adversarial_batch Seed 233 | Round 40/45 | PCC: 0.1251
+[07:09:15] Progress: adversarial_batch Seed 401 | Round 35/45 | PCC: 0.1686
+[07:09:33] Progress: adversarial_batch Seed 999 | Round 30/45 | PCC: 0.1280
+[07:10:09] Progress: adversarial_batch Seed 104 | Round 40/45 | PCC: 0.1546
+[07:10:17] Progress: uncertainty Seed 104 | Round 35/45 | PCC: 0.1313
+[07:10:35] Progress: adversarial_batch Seed 89 | Round 45/45 | PCC: 0.1594
+[07:10:35] FINISH: adversarial_batch Seed 89
+[07:10:55] Progress: adversarial_batch Seed 777 | Round 35/45 | PCC: 0.1354
+[07:12:54] Progress: adversarial_batch Seed 892 | Round 30/45 | PCC: 0.1276
+[07:13:27] Progress: uncertainty Seed 401 | Round 35/45 | PCC: 0.1315
+[07:13:54] Progress: adversarial_batch Seed 56 | Round 45/45 | PCC: 0.1621
+[07:13:54] FINISH: adversarial_batch Seed 56
+[07:15:54] Progress: uncertainty Seed 56 | Round 35/45 | PCC: 0.1347
+[07:17:15] Progress: uncertainty Seed 233 | Round 35/45 | PCC: 0.1447
+[07:17:16] Progress: adversarial_batch Seed 999 | Round 35/45 | PCC: 0.1131
+[07:17:51] Progress: adversarial_batch Seed 401 | Round 40/45 | PCC: 0.0801
+[07:18:01] Progress: uncertainty Seed 27 | Round 35/45 | PCC: 0.1673
+[07:19:35] Progress: adversarial_batch Seed 777 | Round 40/45 | PCC: 0.1703
+[07:19:51] Progress: adversarial_batch Seed 233 | Round 45/45 | PCC: 0.0929
+[07:19:51] FINISH: adversarial_batch Seed 233
+[07:22:09] Progress: uncertainty Seed 89 | Round 40/45 | PCC: 0.1626
+[07:22:42] Progress: adversarial_batch Seed 892 | Round 35/45 | PCC: 0.1308
+[07:23:55] Progress: uncertainty Seed 999 | Round 40/45 | PCC: 0.1461
+[07:25:25] Progress: adversarial_batch Seed 999 | Round 40/45 | PCC: 0.1290
+[07:25:29] Progress: adversarial_batch Seed 104 | Round 45/45 | PCC: 0.1561
+[07:25:29] FINISH: adversarial_batch Seed 104
+[07:26:24] Progress: uncertainty Seed 13 | Round 40/45 | PCC: 0.1466
+[07:26:44] Progress: uncertainty Seed 892 | Round 40/45 | PCC: 0.1508
+[07:27:15] Progress: adversarial_batch Seed 401 | Round 45/45 | PCC: 0.1510
+[07:27:15] FINISH: adversarial_batch Seed 401
+[07:27:47] Progress: adversarial_batch Seed 777 | Round 45/45 | PCC: 0.1152
+[07:27:47] FINISH: adversarial_batch Seed 777
+[07:27:50] Progress: uncertainty Seed 777 | Round 40/45 | PCC: 0.1369
+[07:30:58] Progress: uncertainty Seed 104 | Round 40/45 | PCC: 0.1609
+[07:32:35] Progress: uncertainty Seed 401 | Round 40/45 | PCC: 0.1236
+[07:34:24] Progress: uncertainty Seed 56 | Round 40/45 | PCC: 0.1324
+[07:34:27] Progress: adversarial_batch Seed 892 | Round 40/45 | PCC: 0.1735
+[07:36:07] Progress: adversarial_batch Seed 999 | Round 45/45 | PCC: 0.1304
+[07:36:07] FINISH: adversarial_batch Seed 999
+[07:36:27] Progress: uncertainty Seed 233 | Round 40/45 | PCC: 0.1396
+[07:37:14] Progress: uncertainty Seed 27 | Round 40/45 | PCC: 0.1211
+[07:39:28] Progress: uncertainty Seed 89 | Round 45/45 | PCC: 0.1156
+[07:39:28] FINISH: uncertainty Seed 89
+[07:41:47] Progress: uncertainty Seed 999 | Round 45/45 | PCC: 0.1467
+[07:41:47] FINISH: uncertainty Seed 999
+[07:43:34] Progress: uncertainty Seed 892 | Round 45/45 | PCC: 0.1445
+[07:43:34] FINISH: uncertainty Seed 892
+[07:44:02] Progress: uncertainty Seed 13 | Round 45/45 | PCC: 0.1251
+[07:44:02] FINISH: uncertainty Seed 13
+[07:46:10] Progress: uncertainty Seed 777 | Round 45/45 | PCC: 0.1155
+[07:46:10] FINISH: uncertainty Seed 777
+[07:46:26] Progress: adversarial_batch Seed 892 | Round 45/45 | PCC: 0.1558
+[07:46:26] FINISH: adversarial_batch Seed 892
+[07:48:23] Progress: uncertainty Seed 104 | Round 45/45 | PCC: 0.1373
+[07:48:23] FINISH: uncertainty Seed 104
+[07:49:12] Progress: uncertainty Seed 401 | Round 45/45 | PCC: 0.1077
+[07:49:12] FINISH: uncertainty Seed 401
+[07:51:30] Progress: uncertainty Seed 56 | Round 45/45 | PCC: 0.1243
+[07:51:30] FINISH: uncertainty Seed 56
+[07:52:32] Progress: uncertainty Seed 233 | Round 45/45 | PCC: 0.1375
+[07:52:32] FINISH: uncertainty Seed 233
+[07:53:22] Progress: uncertainty Seed 27 | Round 45/45 | PCC: 0.1290
+[07:53:22] FINISH: uncertainty Seed 27
