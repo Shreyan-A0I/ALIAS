@@ -1,9 +1,9 @@
 """
 Main experiment orchestrator for the Inv-SHAF active learning loop.
 
-Supports Massive Multiprocessing Ensemble Execution.
-Runs all specified active learning strategies across multiple random seeds
-simultaneously using ProcessPoolExecutor.
+Supports Memory-Safe Multiprocessing Ensemble Execution.
+Loads dataset once in main process to share memory via fork,
+reduces worker count for stability, and adds a live progress log.
 """
 
 import os
@@ -39,6 +39,15 @@ from active_learning.acquisition import (
     acquire_kmeans_core, 
     acquire_adversarial_batch
 )
+
+# Global dataset placeholder for fork-sharing
+_GLOBAL_DATASET = None
+
+def log_progress(results_dir, message):
+    """Appends a message to a shared live progress log."""
+    path = os.path.join(results_dir, "live_progress.txt")
+    with open(path, "a") as f:
+        f.write(f"[{time.strftime('%H:%M:%S')}] {message}\n")
 
 def aggregate_results(results_dir, strategies, seeds, n_rounds):
     """Averages the results across all seeds for each strategy."""
@@ -87,16 +96,18 @@ def aggregate_results(results_dir, strategies, seeds, n_rounds):
 
 def run_single_trial(args_tuple):
     """Atomic function to run a completely independent AL trial. Executed by the ProcessPool."""
-    strategy, seed, results_dir, n_rounds, acquire_pct, alpha, beta, lr, feat_dir, device_str = args_tuple
+    strategy, seed, results_dir, n_rounds, acquire_pct, alpha, beta, lr, device_str = args_tuple
     
-    # Each process gets a completely isolated instance of the dataset class
+    # Access the shared global dataset (Copy-on-Write)
+    global _GLOBAL_DATASET
+    dataset = _GLOBAL_DATASET
+    
     device = torch.device(device_str)
     
     seed_out_path = os.path.join(results_dir, f"{strategy}_seed_{seed}.json")
     if os.path.exists(seed_out_path):
         return f"Skipped {strategy} Seed {seed} (Already Exists)"
 
-    dataset = InvSHAFDataset(cached_features_dir=feat_dir)
     n_total = dataset.n_samples
     n_acquire = int(acquire_pct * n_total)
     n_genes = dataset.n_genes
@@ -117,6 +128,8 @@ def run_single_trial(args_tuple):
 
     strategy_results = []
     strategy_acquisitions = []
+
+    log_progress(results_dir, f"START: {strategy} | Seed {seed}")
 
     for round_num in range(1, n_rounds + 1):
         round_start = time.time()
@@ -158,6 +171,10 @@ def run_single_trial(args_tuple):
             "wall_time_seconds": round(round_time, 1),
         })
 
+        # Occasional heart-beat logging
+        if round_num % 5 == 0 or round_num == 1:
+            log_progress(results_dir, f"Progress: {strategy} Seed {seed} | Round {round_num}/{n_rounds} | PCC: {mean_pcc:.4f}")
+
         # --- ACQUIRE ---
         if round_num == n_rounds:
             break
@@ -193,7 +210,14 @@ def run_single_trial(args_tuple):
     with open(seed_out_path, "w") as f:
         json.dump(seed_data, f, indent=2)
 
+    log_progress(results_dir, f"FINISH: {strategy} Seed {seed}")
     return f"Completed {strategy} Seed {seed} (Final PCC: {mean_pcc:.4f})"
+
+
+def init_worker(dataset):
+    """Initializer to set the global dataset in each worker process."""
+    global _GLOBAL_DATASET
+    _GLOBAL_DATASET = dataset
 
 
 def run_experiment(
@@ -219,10 +243,25 @@ def run_experiment(
 
     print(f"Using device class: {device_str}")
     os.makedirs(results_dir, exist_ok=True)
+    
+    # Initialize the Progress Log
+    log_path = os.path.join(results_dir, "live_progress.txt")
+    with open(log_path, "w") as f:
+        f.write(f"=== ALIAS PROJECT LIVE PROGRESS LOG ===\nStarted: {time.ctime()}\n\n")
+
+    # ========== LOAD DATASET ONCE ==========
+    print("\n" + "=" * 60)
+    print("LOADING GLOBAL DATASET (Shared across workers)")
+    print("=" * 60)
 
     feat_dir = "data/cached_features"
     if features == "uni":
         feat_dir = "data/cached_features_uni"
+
+    dataset = InvSHAFDataset(cached_features_dir=feat_dir)
+    input_dim = dataset.features.shape[1]
+
+    print(f"Dataset ready. Dimensions: {input_dim}D. Sharing via fork...")
 
     strategies = [
         "random", 
@@ -239,27 +278,34 @@ def run_experiment(
         for seed in seeds:
             task_args.append((
                 strategy, seed, results_dir, n_rounds, acquire_pct, 
-                alpha, beta, lr, feat_dir, device_str
+                alpha, beta, lr, device_str
             ))
 
     print("\n" + "=" * 60)
     print(f"LAUNCHING {len(task_args)} MULTIPROCESSING TASKS")
-    print(f"Thread locking active. 1 Process = 1 vCPU constraint.")
+    print(f"Worker count: 32 (optimized for 128GB RAM)")
     print("=" * 60)
 
     # ========== MASSIVE MULTIPROCESSING ==========
     start_time = time.time()
     
-    # C6a.16xlarge has 64 vCPUs. Max workers = 60 perfectly fits.
-    # Fallback to local CPU count if run natively on laptop.
-    max_workers = min(60, os.cpu_count() or 1)
+    # Scale down to 32 workers for memory stability on 128GB RAM
+    max_workers = min(32, os.cpu_count() or 1)
     
-    with ProcessPoolExecutor(max_workers=max_workers) as executor:
+    # Use 'fork' on Linux for efficient memory sharing of the global dataset
+    with ProcessPoolExecutor(
+        max_workers=max_workers, 
+        initializer=init_worker, 
+        initargs=(dataset,)
+    ) as executor:
         futures = {executor.submit(run_single_trial, args): args for args in task_args}
         
         for i, future in enumerate(as_completed(futures)):
-            result = future.result()
-            print(f"[{i+1}/{len(task_args)}] {result}")
+            try:
+                result = future.result()
+                print(f"[{i+1}/{len(task_args)}] {result}")
+            except Exception as e:
+                print(f"[{i+1}/{len(task_args)}] ERROR: {str(e)}")
 
     duration = (time.time() - start_time) / 60
     print(f"\nAll parallel executions finished in {duration:.1f} minutes!")
