@@ -22,14 +22,14 @@ from model.model1 import InvariantLearner
 from model.model2 import BatchEffectCheater
 from active_learning.trainer import train_model1, train_model2, evaluate_model1
 from active_learning.acquisition import (
-    acquire_random, acquire_uncertainty, acquire_invariance, acquire_combined,
+    acquire_spatial_min
 )
 
 
 def run_experiment(
     results_dir="results",
-    n_rounds=25,
-    acquire_pct=0.01,  # 1% of total per round
+    n_rounds=36,
+    acquire_pct=0.0025,  # 0.25% of total per round
     alpha=1.0,
     beta=1.0,
     lr=5e-4,
@@ -62,7 +62,7 @@ def run_experiment(
         feat_dir = "data/cached_features_uni"
 
     dataset = InvSHAFDataset(cached_features_dir=feat_dir)
-    test_indices, pool_indices, seed_indices = create_splits(dataset)
+    test_indices, pool_indices, seed_indices = create_splits(dataset, seed_pct=0.01)
 
     n_total = dataset.n_samples
     n_acquire = int(acquire_pct * n_total)  # ~309 patches per round
@@ -73,39 +73,18 @@ def run_experiment(
     print(f"Feature dimension: {input_dim}")
 
     # ========== BASELINE ==========
-    print("\n" + "=" * 60)
-    print("TRAINING BASELINE (Model 1 on full pool)")
-    print("=" * 60)
-
-    # Update standardization with all pool data
-    all_pool_and_seed = np.concatenate([pool_indices, seed_indices])
-    dataset.update_standardization(all_pool_and_seed)
-
-    model1_baseline = InvariantLearner(
-        input_dim=input_dim,
-        n_genes=n_genes,
-        bottleneck_dim=256,
-    ).to(device)
-    model1_baseline = train_model1(
-        model1_baseline, dataset, all_pool_and_seed, device,
-        epochs=50, batch_size=256, lr=lr, alpha=alpha, beta=beta
-    )
-
-    baseline_pcc, baseline_per_gene = evaluate_model1(
-        model1_baseline, dataset, test_indices, device
-    )
-    print(f"Baseline Mean PCC: {baseline_pcc:.4f}")
-
-    # Save baseline
-    baseline_results = {
-        "mean_pcc": float(baseline_pcc),
-        "per_gene_pcc": baseline_per_gene.tolist(),
-    }
-    with open(os.path.join(results_dir, "baseline_results.json"), "w") as f:
-        json.dump(baseline_results, f, indent=2)
+    # Skipping baseline calculation as requested (reusing existing baseline results)
+    baseline_results_path = os.path.join(results_dir, "baseline_results.json")
+    if os.path.exists(baseline_results_path):
+        with open(baseline_results_path, "r") as f:
+            baseline_results = json.load(f)
+        print(f"Loaded existing baseline (PCC: {baseline_results['mean_pcc']:.4f})")
+    else:
+        print("Warning: No baseline found. Proceeding anyway.")
+        baseline_results = {}
 
     # ========== ACTIVE LEARNING LOOP ==========
-    strategies = ["random", "uncertainty", "invariance", "combined"]
+    strategies = ["spatial_min"]
 
     all_results = {"baseline": baseline_results, "strategies": {}}
 
@@ -145,14 +124,8 @@ def run_experiment(
                                   alpha=alpha, beta=beta)
 
             # Train Model 2 from scratch (needed for invariance & combined)
+            # Not needed for spatial_max or diversity
             model2 = None
-            if strategy in ("invariance", "combined"):
-                model2 = BatchEffectCheater(
-                    input_dim=input_dim,
-                    n_genes=n_genes,
-                ).to(device)
-                model2 = train_model2(model2, dataset, labeled, device,
-                                      epochs=100, batch_size=64)
 
             # --- EVALUATE ---
             mean_pcc, per_gene_pcc = evaluate_model1(
@@ -172,39 +145,13 @@ def run_experiment(
             })
 
             # --- ACQUIRE ---
-            if strategy == "random":
-                acquired = acquire_random(dataset, pool, n_acquire, rng)
-                strategy_scores.append({"u_mc": None, "v_inv": None})
-
-            elif strategy == "uncertainty":
-                acquired, u_mc = acquire_uncertainty(
+            if strategy == "spatial_min":
+                acquired, spatial_score = acquire_spatial_min(
                     model1, dataset, pool, n_acquire, device
                 )
                 strategy_scores.append({
-                    "mean_u_mc_acquired": float(u_mc[np.isin(pool, acquired)].mean())
+                    "mean_spatial_score_acquired": float(spatial_score[np.isin(pool, acquired)].mean())
                     if len(acquired) > 0 else 0.0
-                })
-
-            elif strategy == "invariance":
-                acquired, v_inv = acquire_invariance(
-                    model1, model2, dataset, pool, n_acquire, device
-                )
-                strategy_scores.append({
-                    "mean_v_inv_acquired": float(v_inv[np.isin(pool, acquired)].mean())
-                    if len(acquired) > 0 else 0.0
-                })
-
-            elif strategy == "combined":
-                acquired, u_mc, v_inv = acquire_combined(
-                    model1, model2, dataset, pool, n_acquire, device, alpha=alpha
-                )
-                # Save score decomposition for the quaternary plot
-                acq_mask = np.isin(pool, acquired)
-                strategy_scores.append({
-                    "mean_u_mc_acquired": float(u_mc[acq_mask].mean())
-                    if acq_mask.any() else 0.0,
-                    "mean_v_inv_acquired": float(v_inv[acq_mask].mean())
-                    if acq_mask.any() else 0.0,
                 })
 
             # Save acquired barcodes for reproducibility
@@ -243,12 +190,13 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--features", type=str, default="convnext", choices=["convnext", "uni"])
-    parser.add_argument("--rounds", type=int, default=25)
+    parser.add_argument("--rounds", type=int, default=36)
     parser.add_argument("--beta", type=float, default=1.0)
     args = parser.parse_args()
 
     run_experiment(
         n_rounds=args.rounds,
         beta=args.beta,
-        features=args.features
+        features=args.features,
+        acquire_pct=0.0025
     )

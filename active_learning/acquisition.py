@@ -5,7 +5,8 @@ Acquisition functions for the active learning loop.
   1. Random sampling (null hypothesis)
   2. MC Dropout uncertainty (U_MC)
   3. Invariance violation score (V_Inv)
-  4. Combined: U_MC + α·V_Inv
+  4. Spatial Structure Maximization (Moran's I weighted expression)
+  5. Feature-Space Diversity (K-Center Greedy Coreset)
 """
 
 import torch
@@ -42,6 +43,112 @@ def acquire_random(dataset, pool_indices, n_acquire, rng):
         selected.extend(extra.tolist())
 
     return np.array(selected[:n_acquire])
+
+
+@torch.no_grad()
+def acquire_spatial_max(model, dataset, pool_indices, n_acquire, device):
+    """
+    Strategy 4: Spatial Structure Maximization.
+    Computes a score for each patch = sum(PredictedExpr * Morans_I_Weights).
+    Prioritizes patches predicted to express highly spatially-structured genes.
+    """
+    model.eval()
+    model.to(device)
+    
+    loader = make_dataloader(dataset, pool_indices, batch_size=512, shuffle=False)
+    all_scores = []
+    
+    weights = dataset.morans_i_weights.to(device)
+
+    for batch in loader:
+        features = batch["features"].to(device)
+        
+        # Deterministic prediction
+        gene_preds, _ = model(features, return_domain=False)
+        
+        # Weighted sum: (B, 100) * (100,) -> sum over genes -> (B,)
+        patch_spatial_scores = (gene_preds * weights).sum(dim=1)
+        all_scores.append(patch_spatial_scores.cpu())
+        
+    scores = torch.cat(all_scores, dim=0).numpy()
+    top_k = np.argsort(scores)[::-1][:n_acquire]
+    return pool_indices[top_k], scores
+
+
+@torch.no_grad()
+def acquire_spatial_min(model, dataset, pool_indices, n_acquire, device):
+    """
+    Inverse of Strategy 4: Spatial Structure Minimization.
+    Computes a score for each patch = sum(PredictedExpr * Morans_I_Weights).
+    Prioritizes patches predicted to have the LOWEST expression of highly spatially-structured genes.
+    """
+    model.eval()
+    model.to(device)
+    
+    loader = make_dataloader(dataset, pool_indices, batch_size=512, shuffle=False)
+    all_scores = []
+    
+    weights = dataset.morans_i_weights.to(device)
+
+    for batch in loader:
+        features = batch["features"].to(device)
+        gene_preds, _ = model(features, return_domain=False)
+        patch_spatial_scores = (gene_preds * weights).sum(dim=1)
+        all_scores.append(patch_spatial_scores.cpu())
+        
+    scores = torch.cat(all_scores, dim=0).numpy()
+    # Pick the patches with the SMALLEST scores
+    bottom_k = np.argsort(scores)[:n_acquire]
+    return pool_indices[bottom_k], scores
+
+def acquire_diversity(dataset, pool_indices, labeled_indices, n_acquire, device):
+    """
+    Strategy 5: Feature-Space Diversity (K-Center Greedy / Coreset).
+    Selects unlabeled patches whose features are furthest from any currently labeled patch.
+    Calculates Euclidean distance directly on the base features.
+    """
+    # Move features to GPU if possible to speed up distance calcs, or keep on CPU
+    labeled_features = dataset.features[labeled_indices].to(device)
+    pool_features = dataset.features[pool_indices].to(device)
+    
+    # We will incrementally pick the furthest point, add it to our "labeled" set, and repeat
+    # For large pools, computing full pairwise D=O(N*M) is expensive.
+    # Instead, we just maintain the minimum distance to the labeled set for each pool point.
+
+    # 1. Compute initial min distances from each pool point to ANY labeled point
+    # Since labeled_features can be ~3000, we batch the calculation over pool points
+    n_pool = pool_features.shape[0]
+    min_dist = torch.full((n_pool,), float('inf'), device=device)
+    
+    batch_size = 512
+    for i in range(0, n_pool, batch_size):
+        end = min(i + batch_size, n_pool)
+        batch = pool_features[i:end]
+        # Pairwise distance: (batch_size, 1, 1536) - (1, n_labeled, 1536) -> (batch_size, n_labeled)
+        # Using torch.cdist for memory efficiency
+        dists = torch.cdist(batch, labeled_features, p=2.0)
+        min_dist[i:end] = dists.min(dim=1)[0]
+        
+    selected_pool_idx = []
+    
+    # 2. Greedily pick furthest
+    for _ in range(n_acquire):
+        # Find the point with the maximum minimum distance
+        furthest_idx = torch.argmax(min_dist).item()
+        selected_pool_idx.append(furthest_idx)
+        
+        # The new point is now "labeled". Update the min_dist for all remaining pool points.
+        new_point = pool_features[furthest_idx:furthest_idx+1]
+        
+        new_dists = torch.cdist(pool_features, new_point, p=2.0).squeeze(1)
+        # Update minimum distances efficiently
+        min_dist = torch.minimum(min_dist, new_dists)
+        
+        # Don't pick this point again
+        min_dist[furthest_idx] = -1.0
+        
+    acquired_actual_indices = pool_indices[selected_pool_idx]
+    return acquired_actual_indices, None  # No 'score' array to return like the others
 
 
 @torch.no_grad()
@@ -131,21 +238,3 @@ def acquire_invariance(model1, model2, dataset, pool_indices, n_acquire, device)
     v_inv = compute_invariance_violation(model1, model2, dataset, pool_indices, device)
     top_k = np.argsort(v_inv)[::-1][:n_acquire]
     return pool_indices[top_k], v_inv
-
-
-def acquire_combined(model1, model2, dataset, pool_indices, n_acquire, device, alpha=1.0):
-    """
-    Strategy 4: Combined score = U_MC_normalized + α·V_Inv_normalized.
-    Both scores are z-score normalized before combining.
-    """
-    u_mc = compute_mc_uncertainty(model1, dataset, pool_indices, device)
-    v_inv = compute_invariance_violation(model1, model2, dataset, pool_indices, device)
-
-    # Z-score normalize both
-    u_mc_norm = (u_mc - u_mc.mean()) / (u_mc.std() + 1e-8)
-    v_inv_norm = (v_inv - v_inv.mean()) / (v_inv.std() + 1e-8)
-
-    combined = u_mc_norm + alpha * v_inv_norm
-
-    top_k = np.argsort(combined)[::-1][:n_acquire]
-    return pool_indices[top_k], u_mc, v_inv

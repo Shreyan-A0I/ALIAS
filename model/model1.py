@@ -16,7 +16,7 @@ from model.gradient_reversal import GradientReversalLayer
 class Bottleneck(nn.Module):
     """Compress 1024D raw features into 128D invariant representation."""
 
-    def __init__(self, input_dim=1024, bottleneck_dim=256, dropout=0.1):
+    def __init__(self, input_dim=1024, bottleneck_dim=256, dropout=0.3):
         super().__init__()
         # input_dim is now flexible to support 1024 (ConvNeXt) or 1536 (UNI2-h)
         self.linear = nn.Linear(input_dim, bottleneck_dim)
@@ -105,7 +105,7 @@ class DomainDiscriminator(nn.Module):
         self.net = nn.Sequential(
             nn.Linear(bottleneck_dim, hidden_dim),
             nn.GELU(),
-            nn.Dropout(p=0.2),
+            nn.Dropout(p=0.3),
             nn.Linear(hidden_dim, n_donors),
         )
 
@@ -120,7 +120,7 @@ class InvariantLearner(nn.Module):
     """
 
     def __init__(self, input_dim=1024, bottleneck_dim=256, n_genes=100,
-                 n_heads=4, ffn_dim=128, n_donors=8, dropout=0.1):
+                 n_heads=4, ffn_dim=128, n_donors=8, dropout=0.3):
         super().__init__()
 
         self.bottleneck = Bottleneck(input_dim, bottleneck_dim, dropout)

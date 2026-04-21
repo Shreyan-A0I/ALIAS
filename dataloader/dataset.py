@@ -73,6 +73,22 @@ class InvSHAFDataset(Dataset):
         self.gene_names = list(adata.var_names)
         self.n_genes = len(self.gene_names)
 
+        # Extract Moran's I scores for these specific genes and normalize them to sum to 1
+        moran_df = adata.uns['moranI']
+        moran_scores = []
+        for g in self.gene_names:
+            if g in moran_df.index:
+                moran_scores.append(moran_df.loc[g, 'I'])
+            else:
+                moran_scores.append(0.0)
+        
+        self.morans_i_weights = torch.tensor(moran_scores, dtype=torch.float32)
+        # Min-max scale weights to [0, 1] range to avoid negative penalization
+        min_w = self.morans_i_weights.min()
+        max_w = self.morans_i_weights.max()
+        if max_w > min_w:
+            self.morans_i_weights = (self.morans_i_weights - min_w) / (max_w - min_w)
+
         # Create expression matrix aligned with our barcode ordering
         import scipy.sparse as sp
         expression_matrix = []
@@ -105,20 +121,20 @@ class InvSHAFDataset(Dataset):
             [DONOR_TO_IDX[d] for d in self.donor_ids], dtype=torch.long
         )
 
-        # Standardization params (initialized to identity)
-        self.gene_means = torch.zeros(self.n_genes)
-        self.gene_stds = torch.ones(self.n_genes)
+        # Global Standardization: Compute parameters from the ENTIRE pool once
+        print("Computing Global gene standardization parameters...")
+        self.gene_means = self.targets.mean(dim=0)
+        self.gene_stds = self.targets.std(dim=0)
+        # Prevent division by zero for low-variance genes
+        self.gene_stds[self.gene_stds < 1e-6] = 1.0
 
         print(f"Dataset loaded: {self.n_samples} samples, {self.n_genes} genes, "
               f"{self.features.shape[1]}D features")
 
     def update_standardization(self, labeled_indices):
-        """Recompute per-gene mean/std from the currently labeled set."""
-        labeled_targets = self.targets[labeled_indices]
-        self.gene_means = labeled_targets.mean(dim=0)
-        self.gene_stds = labeled_targets.std(dim=0)
-        # Prevent division by zero for near-constant genes
-        self.gene_stds[self.gene_stds < 1e-6] = 1.0
+        """No-Op: Using Global Standardization for stability across rounds."""
+        pass
+        # (Old logic removed to prevent target drift)
 
     def __len__(self):
         return self.n_samples
@@ -137,9 +153,9 @@ class InvSHAFDataset(Dataset):
         }
 
 
-def create_splits(dataset, splits_dir="data/splits"):
+def create_splits(dataset, seed_pct=0.01, splits_dir="data/splits"):
     """
-    Create the fixed test set (15%), pool (85%), and initial seed (5%).
+    Create the fixed test set (15%), pool (85%), and initial seed (configurable).
     Saves barcode lists for reproducibility.
     Returns: test_indices, pool_indices, seed_indices
     """
@@ -148,7 +164,7 @@ def create_splits(dataset, splits_dir="data/splits"):
     all_indices = np.arange(dataset.n_samples)
     donor_labels = np.array(dataset.donor_ids)
 
-    # --- Stratified test/pool split (15% test) ---
+    # Stratified test/pool split (15% test)
     pool_indices, test_indices = train_test_split(
         all_indices,
         test_size=0.15,
@@ -156,9 +172,8 @@ def create_splits(dataset, splits_dir="data/splits"):
         random_state=RANDOM_SEED,
     )
 
-    # --- Seed from pool (5% of TOTAL, stratified) ---
-    # 5% of total ≈ 1,543 patches
-    seed_size = int(0.05 * dataset.n_samples)
+    # Seed from pool (stratified)
+    seed_size = int(seed_pct * dataset.n_samples)
     pool_donor_labels = donor_labels[pool_indices]
 
     remaining_pool_indices, seed_indices = train_test_split(
