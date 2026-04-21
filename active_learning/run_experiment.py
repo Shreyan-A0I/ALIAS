@@ -1,17 +1,28 @@
 """
 Main experiment orchestrator for the Inv-SHAF active learning loop.
 
-Supports Multi-Seed Ensemble Execution.
-Runs all specified active learning strategies across multiple random seeds,
-saving individual runs and aggregating the results at the end.
+Supports Massive Multiprocessing Ensemble Execution.
+Runs all specified active learning strategies across multiple random seeds
+simultaneously using ProcessPoolExecutor.
 """
 
 import os
+# MUST SET THESE BEFORE ANY NUMPY OR PYTORCH IMPORTS TO PREVENT THREAD THRASHING
+os.environ["OMP_NUM_THREADS"] = "1"
+os.environ["OPENBLAS_NUM_THREADS"] = "1"
+os.environ["MKL_NUM_THREADS"] = "1"
+os.environ["VECLIB_MAXIMUM_THREADS"] = "1"
+os.environ["NUMEXPR_NUM_THREADS"] = "1"
+
 import sys
 import json
 import time
 import torch
 import numpy as np
+from concurrent.futures import ProcessPoolExecutor, as_completed
+
+# Limit torch threads explicitly just to be absolutely certain
+torch.set_num_threads(1)
 
 # Add project root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -74,11 +85,122 @@ def aggregate_results(results_dir, strategies, seeds, n_rounds):
     print(f"Aggregation complete. Saved to {out_path}")
 
 
+def run_single_trial(args_tuple):
+    """Atomic function to run a completely independent AL trial. Executed by the ProcessPool."""
+    strategy, seed, results_dir, n_rounds, acquire_pct, alpha, beta, lr, feat_dir, device_str = args_tuple
+    
+    # Each process gets a completely isolated instance of the dataset class
+    device = torch.device(device_str)
+    
+    seed_out_path = os.path.join(results_dir, f"{strategy}_seed_{seed}.json")
+    if os.path.exists(seed_out_path):
+        return f"Skipped {strategy} Seed {seed} (Already Exists)"
+
+    dataset = InvSHAFDataset(cached_features_dir=feat_dir)
+    n_total = dataset.n_samples
+    n_acquire = int(acquire_pct * n_total)
+    n_genes = dataset.n_genes
+    input_dim = dataset.features.shape[1]
+
+    # Create strictly isolated splits for this particular seed
+    test_indices, pool_indices, seed_indices = create_splits(
+        dataset, seed_pct=0.01, random_seed=seed
+    )
+
+    # Reset random states and tracking arrays locally
+    rng = np.random.RandomState(seed)
+    torch.manual_seed(seed)
+    np.random.seed(seed)
+    
+    labeled = seed_indices.copy()
+    pool = pool_indices.copy()
+
+    strategy_results = []
+    strategy_acquisitions = []
+
+    for round_num in range(1, n_rounds + 1):
+        round_start = time.time()
+        pct_labeled = (len(labeled) / n_total) * 100
+
+        # --- TRAIN ---
+        dataset.update_standardization(labeled)
+
+        # Train Model 1
+        model1 = InvariantLearner(
+            input_dim=input_dim, n_genes=n_genes, bottleneck_dim=256
+        ).to(device)
+        model1 = train_model1(model1, dataset, labeled, device,
+                              epochs=50, batch_size=256, lr=lr,
+                              alpha=alpha, beta=beta)
+
+        # Train Model 2 (only if strategy requires domain cheating)
+        model2 = None
+        if strategy in ("invariance", "adversarial_batch"):
+            model2 = BatchEffectCheater(
+                input_dim=input_dim, n_genes=n_genes
+            ).to(device)
+            model2 = train_model2(model2, dataset, labeled, device,
+                                  epochs=100, batch_size=64)
+
+        # --- EVALUATE ---
+        mean_pcc, per_gene_pcc = evaluate_model1(
+            model1, dataset, test_indices, device
+        )
+
+        round_time = time.time() - round_start
+
+        strategy_results.append({
+            "round": round_num,
+            "pct_labeled": round(pct_labeled, 2),
+            "n_labeled": int(len(labeled)),
+            "mean_pcc": float(mean_pcc),
+            "per_gene_pcc": per_gene_pcc.tolist(),
+            "wall_time_seconds": round(round_time, 1),
+        })
+
+        # --- ACQUIRE ---
+        if round_num == n_rounds:
+            break
+
+        if strategy == "random":
+            acquired = acquire_random(dataset, pool, n_acquire, rng)
+        elif strategy == "uncertainty":
+            acquired, _ = acquire_uncertainty(model1, dataset, pool, n_acquire, device)
+        elif strategy == "invariance":
+            acquired, _ = acquire_invariance(model1, model2, dataset, pool, n_acquire, device)
+        elif strategy == "spatial_min":
+            acquired, _ = acquire_spatial_min(model1, dataset, pool, n_acquire, device)
+        elif strategy == "kmeans_core":
+            acquired, _ = acquire_kmeans_core(dataset, pool, n_acquire, device)
+        elif strategy == "adversarial_batch":
+            acquired, _ = acquire_adversarial_batch(model1, dataset, pool, n_acquire, device)
+        else:
+            raise ValueError(f"Unknown strategy: {strategy}")
+
+        # Save acquired barcodes
+        acquired_barcodes = [dataset.barcodes[i] for i in acquired]
+        strategy_acquisitions.append(acquired_barcodes)
+
+        # Move acquired patches from pool to labeled
+        labeled = np.concatenate([labeled, acquired])
+        pool = np.array([i for i in pool if i not in set(acquired)])
+
+    # Save exactly this seed's specific file sequentially to avoid JSON corruption
+    seed_data = {
+        "rounds": strategy_results,
+        "acquisitions": strategy_acquisitions,
+    }
+    with open(seed_out_path, "w") as f:
+        json.dump(seed_data, f, indent=2)
+
+    return f"Completed {strategy} Seed {seed} (Final PCC: {mean_pcc:.4f})"
+
+
 def run_experiment(
     results_dir="results",
     n_rounds=45,
-    acquire_pct=0.002,  # 0.2% of total per round
-    seeds=[13, 27, 56, 89, 104, 233, 401, 777, 892, 999], # 10 explicit seeds
+    acquire_pct=0.002,
+    seeds=[13, 27, 56, 89, 104, 233, 401, 777, 892, 999],
     alpha=1.0,
     beta=1.0,
     lr=5e-4,
@@ -89,36 +211,19 @@ def run_experiment(
 
     if device_str is None:
         if torch.backends.mps.is_available():
-            device = torch.device("mps")
+            device_str = "mps"
         elif torch.cuda.is_available():
-            device = torch.device("cuda")
+            device_str = "cuda"
         else:
-            device = torch.device("cpu")
-    else:
-        device = torch.device(device_str)
+            device_str = "cpu"
 
-    print(f"Using device: {device}")
+    print(f"Using device class: {device_str}")
     os.makedirs(results_dir, exist_ok=True)
-
-    # ========== LOAD RAW DATASET ==========
-    print("\n" + "=" * 60)
-    print("LOADING BASE DATASET")
-    print("=" * 60)
 
     feat_dir = "data/cached_features"
     if features == "uni":
         feat_dir = "data/cached_features_uni"
 
-    dataset = InvSHAFDataset(cached_features_dir=feat_dir)
-    n_total = dataset.n_samples
-    n_acquire = int(acquire_pct * n_total)
-    n_genes = dataset.n_genes
-    input_dim = dataset.features.shape[1]
-
-    print(f"Acquisition batch size: {n_acquire} patches per round ({acquire_pct*100:.2f}%)")
-    print(f"Feature dimension: {input_dim}")
-
-    # ========== ACTIVE LEARNING LOOP ==========
     strategies = [
         "random", 
         "uncertainty", 
@@ -128,122 +233,42 @@ def run_experiment(
         "adversarial_batch"
     ]
 
+    # ========== PREPARE TASK PAYLOADS ==========
+    task_args = []
     for strategy in strategies:
-        print("\n" + "=" * 60)
-        print(f"STRATEGY: {strategy.upper()}")
-        print("=" * 60)
+        for seed in seeds:
+            task_args.append((
+                strategy, seed, results_dir, n_rounds, acquire_pct, 
+                alpha, beta, lr, feat_dir, device_str
+            ))
 
-        for i, seed in enumerate(seeds):
-            print(f"\n--- SEED {i + 1}/{len(seeds)} (Seed Value: {seed}) ---")
-            
-            # Check if this seed is already completed
-            seed_out_path = os.path.join(results_dir, f"{strategy}_seed_{seed}.json")
-            if os.path.exists(seed_out_path):
-                print(f"Found existing results for {strategy} Seed {seed}. Skipping.")
-                continue
+    print("\n" + "=" * 60)
+    print(f"LAUNCHING {len(task_args)} MULTIPROCESSING TASKS")
+    print(f"Thread locking active. 1 Process = 1 vCPU constraint.")
+    print("=" * 60)
 
-            # Create strictly isolated splits for this particular seed
-            test_indices, pool_indices, seed_indices = create_splits(
-                dataset, seed_pct=0.01, random_seed=seed
-            )
+    # ========== MASSIVE MULTIPROCESSING ==========
+    start_time = time.time()
+    
+    # C6a.16xlarge has 64 vCPUs. Max workers = 60 perfectly fits.
+    # Fallback to local CPU count if run natively on laptop.
+    max_workers = min(60, os.cpu_count() or 1)
+    
+    with ProcessPoolExecutor(max_workers=max_workers) as executor:
+        futures = {executor.submit(run_single_trial, args): args for args in task_args}
+        
+        for i, future in enumerate(as_completed(futures)):
+            result = future.result()
+            print(f"[{i+1}/{len(task_args)}] {result}")
 
-            # Reset random states and tracking arrays
-            rng = np.random.RandomState(seed)
-            torch.manual_seed(seed)
-            np.random.seed(seed)
-            
-            labeled = seed_indices.copy()
-            pool = pool_indices.copy()
+    duration = (time.time() - start_time) / 60
+    print(f"\nAll parallel executions finished in {duration:.1f} minutes!")
 
-            strategy_results = []
-            strategy_acquisitions = []
-
-            for round_num in range(1, n_rounds + 1):
-                round_start = time.time()
-                pct_labeled = (len(labeled) / n_total) * 100
-
-                print(f"\n  Round {round_num}/{n_rounds} | "
-                      f"Labeled: {len(labeled)} ({pct_labeled:.1f}%) | "
-                      f"Pool: {len(pool)}")
-
-                # --- TRAIN ---
-                dataset.update_standardization(labeled)
-
-                # Train Model 1
-                model1 = InvariantLearner(
-                    input_dim=input_dim, n_genes=n_genes, bottleneck_dim=256
-                ).to(device)
-                model1 = train_model1(model1, dataset, labeled, device,
-                                      epochs=50, batch_size=256, lr=lr,
-                                      alpha=alpha, beta=beta)
-
-                # Train Model 2 (only if strategy requires domain cheating)
-                model2 = None
-                if strategy in ("invariance", "adversarial_batch"):
-                    model2 = BatchEffectCheater(
-                        input_dim=input_dim, n_genes=n_genes
-                    ).to(device)
-                    model2 = train_model2(model2, dataset, labeled, device,
-                                          epochs=100, batch_size=64)
-
-                # --- EVALUATE ---
-                mean_pcc, per_gene_pcc = evaluate_model1(
-                    model1, dataset, test_indices, device
-                )
-
-                round_time = time.time() - round_start
-                print(f"  Mean PCC: {mean_pcc:.4f} | Time: {round_time:.1f}s")
-
-                strategy_results.append({
-                    "round": round_num,
-                    "pct_labeled": round(pct_labeled, 2),
-                    "n_labeled": int(len(labeled)),
-                    "mean_pcc": float(mean_pcc),
-                    "per_gene_pcc": per_gene_pcc.tolist(),
-                    "wall_time_seconds": round(round_time, 1),
-                })
-
-                # --- ACQUIRE ---
-                # Stop acquiring if we hit the limit
-                if round_num == n_rounds:
-                    break
-
-                if strategy == "random":
-                    acquired = acquire_random(dataset, pool, n_acquire, rng)
-                elif strategy == "uncertainty":
-                    acquired, _ = acquire_uncertainty(model1, dataset, pool, n_acquire, device)
-                elif strategy == "invariance":
-                    acquired, _ = acquire_invariance(model1, model2, dataset, pool, n_acquire, device)
-                elif strategy == "spatial_min":
-                    acquired, _ = acquire_spatial_min(model1, dataset, pool, n_acquire, device)
-                elif strategy == "kmeans_core":
-                    acquired, _ = acquire_kmeans_core(dataset, pool, n_acquire, device)
-                elif strategy == "adversarial_batch":
-                    acquired, _ = acquire_adversarial_batch(model1, dataset, pool, n_acquire, device)
-                else:
-                    raise ValueError(f"Unknown strategy: {strategy}")
-
-                # Save acquired barcodes
-                acquired_barcodes = [dataset.barcodes[i] for i in acquired]
-                strategy_acquisitions.append(acquired_barcodes)
-
-                # Move acquired patches from pool to labeled
-                labeled = np.concatenate([labeled, acquired])
-                pool = np.array([i for i in pool if i not in set(acquired)])
-
-            # Save this specific seed's results
-            seed_data = {
-                "rounds": strategy_results,
-                "acquisitions": strategy_acquisitions,
-            }
-            with open(seed_out_path, "w") as f:
-                json.dump(seed_data, f, indent=2)
-
-    # Automatically aggregate all seeds once execution completes
+    # ========== AGGREGATION ==========
     aggregate_results(results_dir, strategies, seeds, n_rounds)
 
     print("\n" + "=" * 60)
-    print("ALL EXPERIMENTS COMPLETE!")
+    print("MULTISEED EXPERIMENT COMPLETE!")
     print("=" * 60)
 
 
@@ -255,6 +280,11 @@ if __name__ == "__main__":
     parser.add_argument("--rounds", type=int, default=45)
     parser.add_argument("--beta", type=float, default=1.0)
     args = parser.parse_args()
+
+    # Prevent potential multiprocessing freeze on macOS
+    if sys.platform == 'darwin':
+        import multiprocessing
+        multiprocessing.set_start_method('spawn', force=True)
 
     run_experiment(
         n_rounds=args.rounds,
