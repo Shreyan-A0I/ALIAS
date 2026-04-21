@@ -153,10 +153,10 @@ class InvSHAFDataset(Dataset):
         }
 
 
-def create_splits(dataset, seed_pct=0.01, splits_dir="data/splits"):
+def create_splits(dataset, seed_pct=0.01, splits_dir="data/splits", random_seed=42):
     """
     Create the fixed test set (15%), pool (85%), and initial seed (configurable).
-    Saves barcode lists for reproducibility.
+    Saves barcode lists for reproducibility, appending the random_seed to filename.
     Returns: test_indices, pool_indices, seed_indices
     """
     os.makedirs(splits_dir, exist_ok=True)
@@ -169,7 +169,7 @@ def create_splits(dataset, seed_pct=0.01, splits_dir="data/splits"):
         all_indices,
         test_size=0.15,
         stratify=donor_labels,
-        random_state=RANDOM_SEED,
+        random_state=random_seed,
     )
 
     # Seed from pool (stratified)
@@ -180,16 +180,16 @@ def create_splits(dataset, seed_pct=0.01, splits_dir="data/splits"):
         pool_indices,
         test_size=seed_size,
         stratify=pool_donor_labels,
-        random_state=RANDOM_SEED,
+        random_state=random_seed,
     )
 
     # Save barcode lists for reproducibility
     test_barcodes = [dataset.barcodes[i] for i in test_indices]
     seed_barcodes = [dataset.barcodes[i] for i in seed_indices]
 
-    with open(os.path.join(splits_dir, "test_barcodes.json"), "w") as f:
+    with open(os.path.join(splits_dir, f"seed_{random_seed}_test_barcodes.json"), "w") as f:
         json.dump(test_barcodes, f)
-    with open(os.path.join(splits_dir, "seed_barcodes.json"), "w") as f:
+    with open(os.path.join(splits_dir, f"seed_{random_seed}_seed_barcodes.json"), "w") as f:
         json.dump(seed_barcodes, f)
 
     print(f"Splits created:")
