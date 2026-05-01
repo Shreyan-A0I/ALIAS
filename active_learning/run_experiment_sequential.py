@@ -1,9 +1,7 @@
 """
-Main experiment orchestrator for the Inv-SHAF active learning loop.
-
-Supports Multi-Seed Ensemble Execution.
-Runs all specified active learning strategies across multiple random seeds,
-saving individual runs and aggregating the results at the end.
+Experiment orchestrator for Inv-SHAF.
+Executes an ensemble of active learning strategies across multiple random seeds,
+aggregating results to compute mean performance and standard error.
 """
 
 import os
@@ -13,7 +11,7 @@ import time
 import torch
 import numpy as np
 
-# Add project root to path
+# Ensure project modules are importable
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from dataloader.dataset import InvSHAFDataset, create_splits
@@ -30,17 +28,16 @@ from active_learning.acquisition import (
 )
 
 def aggregate_results(results_dir, strategies, seeds, n_rounds):
-    """Averages the results across all seeds for each strategy."""
-    print("\n" + "=" * 60)
-    print("AGGREGATING MULTI-SEED RESULTS")
-    print("=" * 60)
+    """Computes cross-seed averages for all strategy results."""
+    print("\n" + "=" * 40)
+    print("AGGREGATING ENSEMBLE RESULTS")
+    print("=" * 40)
     
     aggregated = {}
     
     for strategy in strategies:
         strategy_data = {"rounds": []}
         
-        # We need to average PCC per round across all available seeds
         for rnd in range(1, n_rounds + 1):
             rnd_pccs = []
             labeled_pct = 0.0
@@ -50,14 +47,13 @@ def aggregate_results(results_dir, strategies, seeds, n_rounds):
                 if os.path.exists(path):
                     with open(path, "r") as f:
                         data = json.load(f)
-                        # Find the matching round
                         for r_data in data["rounds"]:
                             if r_data["round"] == rnd:
                                 rnd_pccs.append(r_data["mean_pcc"])
                                 labeled_pct = r_data["pct_labeled"]
                                 break
                                 
-            if len(rnd_pccs) > 0:
+            if rnd_pccs:
                 strategy_data["rounds"].append({
                     "round": rnd,
                     "pct_labeled": labeled_pct,
@@ -71,21 +67,21 @@ def aggregate_results(results_dir, strategies, seeds, n_rounds):
     out_path = os.path.join(results_dir, "aggregated_results.json")
     with open(out_path, "w") as f:
         json.dump(aggregated, f, indent=2)
-    print(f"Aggregation complete. Saved to {out_path}")
+    print(f"Aggregation complete: {out_path}")
 
 
 def run_experiment(
     results_dir="results",
     n_rounds=45,
-    acquire_pct=0.002,  # 0.2% of total per round
-    seeds=[13, 27, 56, 89, 104, 233, 401, 777, 892, 999], # 10 explicit seeds
+    acquire_pct=0.002,
+    seeds=[13, 27, 56, 89, 104, 233, 401, 777, 892, 999],
     alpha=1.0,
     beta=1.0,
     lr=5e-4,
     features="uni",
     device_str=None,
 ):
-    """Run the multi-seed Inv-SHAF active learning experiment."""
+    """Main AL loop across all strategies and seeds."""
 
     if device_str is None:
         if torch.backends.mps.is_available():
@@ -97,28 +93,18 @@ def run_experiment(
     else:
         device = torch.device(device_str)
 
-    print(f"Using device: {device}")
+    print(f"Device: {device}")
     os.makedirs(results_dir, exist_ok=True)
 
-    # ========== LOAD RAW DATASET ==========
-    print("\n" + "=" * 60)
-    print("LOADING BASE DATASET")
-    print("=" * 60)
-
-    feat_dir = "data/cached_features"
-    if features == "uni":
-        feat_dir = "data/cached_features_uni"
-
+    # Load dataset features once to share across all seeds
+    feat_dir = "data/cached_features_uni" if features == "uni" else "data/cached_features"
     dataset = InvSHAFDataset(cached_features_dir=feat_dir)
+    
     n_total = dataset.n_samples
     n_acquire = int(acquire_pct * n_total)
     n_genes = dataset.n_genes
     input_dim = dataset.features.shape[1]
 
-    print(f"Acquisition batch size: {n_acquire} patches per round ({acquire_pct*100:.2f}%)")
-    print(f"Feature dimension: {input_dim}")
-
-    # ========== ACTIVE LEARNING LOOP ==========
     strategies = [
         "random", 
         "uncertainty", 
@@ -129,25 +115,20 @@ def run_experiment(
     ]
 
     for strategy in strategies:
-        print("\n" + "=" * 60)
-        print(f"STRATEGY: {strategy.upper()}")
-        print("=" * 60)
+        print(f"\n>>> Starting Strategy: {strategy.upper()} <<<")
 
         for i, seed in enumerate(seeds):
-            print(f"\n--- SEED {i + 1}/{len(seeds)} (Seed Value: {seed}) ---")
-            
-            # Check if this seed is already completed
             seed_out_path = os.path.join(results_dir, f"{strategy}_seed_{seed}.json")
             if os.path.exists(seed_out_path):
-                print(f"Found existing results for {strategy} Seed {seed}. Skipping.")
                 continue
 
-            # Create strictly isolated splits for this particular seed
+            print(f"Seed {seed} ({i+1}/{len(seeds)})")
+            
+            # Isolated split for this seed
             test_indices, pool_indices, seed_indices = create_splits(
                 dataset, seed_pct=0.01, random_seed=seed
             )
 
-            # Reset random states and tracking arrays
             rng = np.random.RandomState(seed)
             torch.manual_seed(seed)
             np.random.seed(seed)
@@ -162,14 +143,10 @@ def run_experiment(
                 round_start = time.time()
                 pct_labeled = (len(labeled) / n_total) * 100
 
-                print(f"\n  Round {round_num}/{n_rounds} | "
-                      f"Labeled: {len(labeled)} ({pct_labeled:.1f}%) | "
-                      f"Pool: {len(pool)}")
-
-                # --- TRAIN ---
+                # Normalizing pool data based on the current labeled set
                 dataset.update_standardization(labeled)
 
-                # Train Model 1
+                # Initialize and train Model 1
                 model1 = InvariantLearner(
                     input_dim=input_dim, n_genes=n_genes, bottleneck_dim=256
                 ).to(device)
@@ -177,7 +154,7 @@ def run_experiment(
                                       epochs=50, batch_size=256, lr=lr,
                                       alpha=alpha, beta=beta)
 
-                # Train Model 2 (only if strategy requires domain cheating)
+                # Train Model 2 only if the strategy depends on its predictions
                 model2 = None
                 if strategy in ("invariance", "adversarial_batch"):
                     model2 = BatchEffectCheater(
@@ -186,13 +163,13 @@ def run_experiment(
                     model2 = train_model2(model2, dataset, labeled, device,
                                           epochs=100, batch_size=64)
 
-                # --- EVALUATE ---
+                # Performance check
                 mean_pcc, per_gene_pcc = evaluate_model1(
                     model1, dataset, test_indices, device
                 )
 
                 round_time = time.time() - round_start
-                print(f"  Mean PCC: {mean_pcc:.4f} | Time: {round_time:.1f}s")
+                print(f"  R{round_num} | PCC: {mean_pcc:.4f} | {pct_labeled:.2f}% labels")
 
                 strategy_results.append({
                     "round": round_num,
@@ -203,11 +180,10 @@ def run_experiment(
                     "wall_time_seconds": round(round_time, 1),
                 })
 
-                # --- ACQUIRE ---
-                # Stop acquiring if we hit the limit
                 if round_num == n_rounds:
                     break
 
+                # Acquisition step
                 if strategy == "random":
                     acquired = acquire_random(dataset, pool, n_acquire, rng)
                 elif strategy == "uncertainty":
@@ -220,36 +196,22 @@ def run_experiment(
                     acquired, _ = acquire_kmeans_core(dataset, pool, n_acquire, device)
                 elif strategy == "adversarial_batch":
                     acquired, _ = acquire_adversarial_batch(model1, dataset, pool, n_acquire, device)
-                else:
-                    raise ValueError(f"Unknown strategy: {strategy}")
 
-                # Save acquired barcodes
-                acquired_barcodes = [dataset.barcodes[i] for i in acquired]
-                strategy_acquisitions.append(acquired_barcodes)
-
-                # Move acquired patches from pool to labeled
+                # Update indices for the next round
+                strategy_acquisitions.append([dataset.barcodes[i] for i in acquired])
                 labeled = np.concatenate([labeled, acquired])
                 pool = np.array([i for i in pool if i not in set(acquired)])
 
-            # Save this specific seed's results
-            seed_data = {
-                "rounds": strategy_results,
-                "acquisitions": strategy_acquisitions,
-            }
+            # Serialize seed results
             with open(seed_out_path, "w") as f:
-                json.dump(seed_data, f, indent=2)
+                json.dump({"rounds": strategy_results, "acquisitions": strategy_acquisitions}, f, indent=2)
 
-    # Automatically aggregate all seeds once execution completes
+    # Calculate final means across all seeds
     aggregate_results(results_dir, strategies, seeds, n_rounds)
-
-    print("\n" + "=" * 60)
-    print("ALL EXPERIMENTS COMPLETE!")
-    print("=" * 60)
 
 
 if __name__ == "__main__":
     import argparse
-
     parser = argparse.ArgumentParser()
     parser.add_argument("--features", type=str, default="uni", choices=["convnext", "uni"])
     parser.add_argument("--rounds", type=int, default=45)
@@ -262,3 +224,4 @@ if __name__ == "__main__":
         features=args.features,
         acquire_pct=0.0020
     )
+

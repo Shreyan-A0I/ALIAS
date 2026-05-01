@@ -1,6 +1,6 @@
 """
-Training pipeline for Model 1 (Invariant Learner) and Model 2 (Batch-Effect Cheater).
-Includes evaluation with PCC metric and early stopping.
+Training routines for the Invariant Learner and the Batch-Effect Cheater.
+Handles joint adversarial optimization, early stopping, and PCC evaluation.
 """
 
 import torch
@@ -15,8 +15,8 @@ def train_model1(model, dataset, labeled_indices, device,
                  epochs=50, batch_size=256, lr=5e-4, weight_decay=1e-4,
                  patience=12, alpha=1.0, beta=1.0):
     """
-    Train Model 1 (Invariant Learner) from scratch on the labeled set.
-    Joint loss = MSE(Head A) + CrossEntropy(Head C) with GRL sign flip.
+    Trains Model 1 using a joint loss: MSE for genes and CrossEntropy for donors.
+    The GRL lambda scales linearly across epochs.
     """
     model.train()
     model.to(device)
@@ -29,7 +29,7 @@ def train_model1(model, dataset, labeled_indices, device,
     mse_loss_fn = nn.MSELoss()
     ce_loss_fn = nn.CrossEntropyLoss()
 
-    # Create validation split (10% of labeled for early stopping)
+    # 10% validation split for early stopping
     n_labeled = len(labeled_indices)
     perm = np.random.RandomState(42).permutation(n_labeled)
     val_size = max(1, int(0.1 * n_labeled))
@@ -44,7 +44,6 @@ def train_model1(model, dataset, labeled_indices, device,
     best_state = None
 
     for epoch in range(epochs):
-        # Update GRL lambda
         grl_lambda = compute_grl_lambda(epoch, epochs)
         model.set_grl_lambda(grl_lambda)
 
@@ -65,7 +64,6 @@ def train_model1(model, dataset, labeled_indices, device,
 
             optimizer.zero_grad()
             loss_total.backward()
-            # Gradient clipping to stabilize training against GRL reversals or outliers
             nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
             optimizer.step()
 
@@ -74,7 +72,6 @@ def train_model1(model, dataset, labeled_indices, device,
 
         avg_train_loss = epoch_loss / max(n_batches, 1)
 
-        # Validation
         model.eval()
         val_loss = 0.0
         val_batches = 0
@@ -93,7 +90,6 @@ def train_model1(model, dataset, labeled_indices, device,
         avg_val_loss = val_loss / max(val_batches, 1)
         scheduler.step(avg_val_loss)
 
-        # Early stopping
         if avg_val_loss < best_val_loss:
             best_val_loss = avg_val_loss
             patience_counter = 0
@@ -103,7 +99,6 @@ def train_model1(model, dataset, labeled_indices, device,
             if patience_counter >= patience:
                 break
 
-    # Restore best model
     if best_state is not None:
         model.load_state_dict(best_state)
         model.to(device)
@@ -114,9 +109,8 @@ def train_model1(model, dataset, labeled_indices, device,
 def train_model2(model, dataset, labeled_indices, device,
                  epochs=100, batch_size=64, lr=1e-3, patience=15):
     """
-    Train Model 2 (Batch-Effect Cheater) from scratch.
-    Each donor head trains independently on its own labeled patches.
-    No weight decay — we want overfitting.
+    Trains the donor-specific heads of Model 2. 
+    Intentionally overfits to batch shortcuts (no weight decay).
     """
     model.train()
     model.to(device)
@@ -124,7 +118,6 @@ def train_model2(model, dataset, labeled_indices, device,
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
     mse_loss_fn = nn.MSELoss()
 
-    # Group labeled indices by donor
     donor_groups = {}
     for idx in labeled_indices:
         donor = dataset.donor_ids[idx]
@@ -162,7 +155,7 @@ def train_model2(model, dataset, labeled_indices, device,
 
         avg_loss = total_loss / max(total_batches, 1)
 
-        # Simple early stopping on training loss (no validation for Model 2)
+        # Basic early stopping based on training convergence
         if avg_loss < best_loss:
             best_loss = avg_loss
             patience_counter = 0
@@ -181,10 +174,7 @@ def train_model2(model, dataset, labeled_indices, device,
 
 @torch.no_grad()
 def evaluate_model1(model, dataset, test_indices, device):
-    """
-    Evaluate Model 1 on the fixed test set.
-    Returns: mean PCC across genes, per-gene PCC array.
-    """
+    """Evaluates PCC on the test set, inverse-standardizing to original gene scales."""
     model.eval()
     model.to(device)
 
@@ -195,11 +185,9 @@ def evaluate_model1(model, dataset, test_indices, device):
 
     for batch in loader:
         features = batch["features"].to(device)
-        targets_raw = batch["targets_raw"]  # unstandardized
+        targets_raw = batch["targets_raw"]
 
         gene_preds_std, _ = model(features, return_domain=False)
-
-        # Inverse-transform predictions back to original scale
         gene_preds = (
             gene_preds_std.cpu() * (dataset.gene_stds + 1e-6) + dataset.gene_means
         )
@@ -207,16 +195,15 @@ def evaluate_model1(model, dataset, test_indices, device):
         all_preds.append(gene_preds)
         all_targets.append(targets_raw)
 
-    all_preds = torch.cat(all_preds, dim=0).numpy()    # (N_test, 100)
-    all_targets = torch.cat(all_targets, dim=0).numpy()  # (N_test, 100)
+    all_preds = torch.cat(all_preds, dim=0).numpy()
+    all_targets = torch.cat(all_targets, dim=0).numpy()
 
-    # Compute PCC per gene
+    # Per-gene PCC calculation
     per_gene_pcc = []
     for g in range(all_preds.shape[1]):
         pred_g = all_preds[:, g]
         true_g = all_targets[:, g]
 
-        # Handle constant columns
         if np.std(pred_g) < 1e-8 or np.std(true_g) < 1e-8:
             per_gene_pcc.append(0.0)
         else:
@@ -227,3 +214,4 @@ def evaluate_model1(model, dataset, test_indices, device):
     mean_pcc = per_gene_pcc.mean()
 
     return mean_pcc, per_gene_pcc
+

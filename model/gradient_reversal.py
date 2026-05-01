@@ -1,7 +1,7 @@
 """
-Gradient Reversal Layer for domain-adversarial training.
-Implements Ganin et al. (2016) - forward pass is identity,
-backward pass flips and scales gradients by -lambda.
+Gradient Reversal Layer (GRL) for domain-adversarial training.
+Acts as an identity during forward propagation and flips gradients during 
+backpropagation to force invariant feature learning.
 """
 
 import torch
@@ -21,7 +21,7 @@ class GradientReversalFunction(Function):
 
 
 class GradientReversalLayer(torch.nn.Module):
-    """Wrapper module for the GRL function."""
+    """Module wrapper for the autograd GRL function."""
 
     def __init__(self):
         super().__init__()
@@ -36,10 +36,9 @@ class GradientReversalLayer(torch.nn.Module):
 
 def compute_grl_lambda(epoch, total_epochs):
     """
-    Progressive lambda schedule from Ganin et al. (2016).
-    λ(p) = 2 / (1 + exp(-10p)) - 1
-    where p = epoch / total_epochs (0 → 1).
-    Starts near 0 and saturates near 1.
+    Standard progressive lambda schedule (Ganin et al. 2016).
+    Starts at 0 and saturates at 1 as training progresses.
     """
     p = epoch / max(total_epochs, 1)
     return 2.0 / (1.0 + math.exp(-10.0 * p)) - 1.0
+

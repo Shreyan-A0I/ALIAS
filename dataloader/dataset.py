@@ -1,12 +1,6 @@
 """
-Dataset and data splitting utilities for the Inv-SHAF active learning framework.
-
-Handles:
-- Loading cached 1024D ConvNeXt features + 100-gene expression targets
-- Stratified train/test splitting (85/15)
-- Initial seed creation (5% of total)
-- Per-gene standardization (updated as labels are acquired)
-- Barcode list persistence for reproducibility
+Dataset and data splitting utilities for Inv-SHAF.
+Handles feature loading, stratified splitting, and gene standardization.
 """
 
 import os
@@ -19,7 +13,7 @@ from sklearn.model_selection import train_test_split
 from torch.utils.data import Dataset, DataLoader, Subset
 
 
-RANDOM_SEED = 57
+# Pre-selected donors from the DLPFC anterior set
 DONOR_IDS = [
     "Br2743_ant", "Br3942_ant", "Br6423_ant", "Br8492_ant",
     "Br6471_ant", "Br6522_ant", "Br8325_ant", "Br8667_ant",
@@ -29,8 +23,8 @@ DONOR_TO_IDX = {d: i for i, d in enumerate(DONOR_IDS)}
 
 class InvSHAFDataset(Dataset):
     """
-    Dataset that serves cached 1024D feature vectors, 100-gene expression
-    targets, and donor labels for any subset of barcodes.
+    Serves cached image features and expression targets for active learning.
+    Aligns patch-level features with barcodes and donor metadata.
     """
 
     def __init__(
@@ -41,11 +35,11 @@ class InvSHAFDataset(Dataset):
         super().__init__()
         self.cached_features_dir = cached_features_dir
 
-        # --- Load all cached features ---
         self.barcodes = []
         self.donor_ids = []
         self.features = []
 
+        # Load pre-extracted backbone features
         for donor_id in DONOR_IDS:
             cache_path = os.path.join(self.cached_features_dir, f"{donor_id}.pt")
             cache = torch.load(cache_path, weights_only=False)
@@ -57,49 +51,36 @@ class InvSHAFDataset(Dataset):
             self.features.append(cache["features"])
 
         self.features = torch.cat(self.features, dim=0)
-        # Flatten in case cached features have extra spatial dims (N, 1024, 1, 1) → (N, 1024)
         if self.features.ndim > 2:
             self.features = self.features.view(self.features.shape[0], -1)
+        
         self.n_samples = len(self.barcodes)
 
-        # --- Load gene expression targets from h5ad ---
-        print(f"Loading gene expression targets from {h5ad_path}...")
+        # Align with gene expression targets
+        print(f"Loading expression targets from {h5ad_path}...")
         adata = ad.read_h5ad(h5ad_path)
         adata.obs_names_make_unique()
 
-        # Build a barcode→index mapping from the adata object
-        # We need to handle that barcodes aren't unique across donors in adata
-        # so we match by (sample_id, barcode)
         self.gene_names = list(adata.var_names)
         self.n_genes = len(self.gene_names)
 
-        # Extract Moran's I scores for these specific genes and normalize them to sum to 1
+        # Normalize Moran's I scores to use as strategy weights
         moran_df = adata.uns['moranI']
-        moran_scores = []
-        for g in self.gene_names:
-            if g in moran_df.index:
-                moran_scores.append(moran_df.loc[g, 'I'])
-            else:
-                moran_scores.append(0.0)
+        moran_scores = [moran_df.loc[g, 'I'] if g in moran_df.index else 0.0 for g in self.gene_names]
         
         self.morans_i_weights = torch.tensor(moran_scores, dtype=torch.float32)
-        # Min-max scale weights to [0, 1] range to avoid negative penalization
-        min_w = self.morans_i_weights.min()
-        max_w = self.morans_i_weights.max()
+        min_w, max_w = self.morans_i_weights.min(), self.morans_i_weights.max()
         if max_w > min_w:
             self.morans_i_weights = (self.morans_i_weights - min_w) / (max_w - min_w)
 
-        # Create expression matrix aligned with our barcode ordering
+        # Map barcodes to expression matrix rows
         import scipy.sparse as sp
         expression_matrix = []
 
-        for i, (bc, donor) in enumerate(zip(self.barcodes, self.donor_ids)):
-            # Find the matching row in adata
+        for bc, donor in zip(self.barcodes, self.donor_ids):
             mask = (adata.obs.index == bc) & (adata.obs["sample_id"] == donor)
             idx = np.where(mask)[0]
-
             if len(idx) == 0:
-                # Fallback: try just barcode
                 mask = adata.obs.index == bc
                 idx = np.where(mask)[0]
 
@@ -109,98 +90,68 @@ class InvSHAFDataset(Dataset):
                     row = row.toarray().flatten()
                 expression_matrix.append(row)
             else:
-                # Should not happen if data is consistent
                 expression_matrix.append(np.zeros(self.n_genes))
 
-        self.targets = torch.tensor(
-            np.array(expression_matrix), dtype=torch.float32
-        )  # (N, 100)
+        self.targets = torch.tensor(np.array(expression_matrix), dtype=torch.float32)
+        self.donor_labels = torch.tensor([DONOR_TO_IDX[d] for d in self.donor_ids], dtype=torch.long)
 
-        # Donor labels as integers
-        self.donor_labels = torch.tensor(
-            [DONOR_TO_IDX[d] for d in self.donor_ids], dtype=torch.long
-        )
-
-        # Global Standardization: Compute parameters from the ENTIRE pool once
-        print("Computing Global gene standardization parameters...")
+        # Global standardization parameters (calculated once to prevent drift)
         self.gene_means = self.targets.mean(dim=0)
         self.gene_stds = self.targets.std(dim=0)
-        # Prevent division by zero for low-variance genes
         self.gene_stds[self.gene_stds < 1e-6] = 1.0
 
-        print(f"Dataset loaded: {self.n_samples} samples, {self.n_genes} genes, "
-              f"{self.features.shape[1]}D features")
+        print(f"Dataset ready: {self.n_samples} patches | {self.n_genes} genes")
 
     def update_standardization(self, labeled_indices):
-        """No-Op: Using Global Standardization for stability across rounds."""
+        """Global standardization is used to keep round-to-round targets stable."""
         pass
-        # (Old logic removed to prevent target drift)
 
     def __len__(self):
         return self.n_samples
 
     def __getitem__(self, idx):
-        target_standardized = (
-            (self.targets[idx] - self.gene_means) / self.gene_stds
-        )
-
+        target_std = (self.targets[idx] - self.gene_means) / self.gene_stds
         return {
-            "features": self.features[idx],       # (1024,)
-            "targets": target_standardized,        # (n_genes,)
-            "targets_raw": self.targets[idx],      # (n_genes,) unstandardized
-            "donor_label": self.donor_labels[idx],  # scalar
-            "index": idx,                           # for tracking
+            "features": self.features[idx],
+            "targets": target_std,
+            "targets_raw": self.targets[idx],
+            "donor_label": self.donor_labels[idx],
+            "index": idx,
         }
 
 
 def create_splits(dataset, seed_pct=0.01, splits_dir="data/splits", random_seed=42):
-    """
-    Create the fixed test set (15%), pool (85%), and initial seed (configurable).
-    Saves barcode lists for reproducibility, appending the random_seed to filename.
-    Returns: test_indices, pool_indices, seed_indices
-    """
+    """Creates stratified test/pool/seed splits and persists barcodes for reproducibility."""
     os.makedirs(splits_dir, exist_ok=True)
 
     all_indices = np.arange(dataset.n_samples)
-    donor_labels = np.array(dataset.donor_ids)
+    donors = np.array(dataset.donor_ids)
 
-    # Stratified test/pool split (15% test)
-    pool_indices, test_indices = train_test_split(
-        all_indices,
-        test_size=0.15,
-        stratify=donor_labels,
-        random_state=random_seed,
+    # 15% test set split
+    pool_idx, test_idx = train_test_split(
+        all_indices, test_size=0.15, stratify=donors, random_state=random_seed
     )
 
-    # Seed from pool (stratified)
+    # Initial labeled seed
     seed_size = int(seed_pct * dataset.n_samples)
-    pool_donor_labels = donor_labels[pool_indices]
-
-    remaining_pool_indices, seed_indices = train_test_split(
-        pool_indices,
-        test_size=seed_size,
-        stratify=pool_donor_labels,
-        random_state=random_seed,
+    remaining_pool_idx, seed_idx = train_test_split(
+        pool_idx, test_size=seed_size, stratify=donors[pool_idx], random_state=random_seed
     )
 
-    # Save barcode lists for reproducibility
-    test_barcodes = [dataset.barcodes[i] for i in test_indices]
-    seed_barcodes = [dataset.barcodes[i] for i in seed_indices]
+    # Persist barcodes to disk
+    test_bc = [dataset.barcodes[i] for i in test_idx]
+    seed_bc = [dataset.barcodes[i] for i in seed_idx]
 
     with open(os.path.join(splits_dir, f"seed_{random_seed}_test_barcodes.json"), "w") as f:
-        json.dump(test_barcodes, f)
+        json.dump(test_bc, f)
     with open(os.path.join(splits_dir, f"seed_{random_seed}_seed_barcodes.json"), "w") as f:
-        json.dump(seed_barcodes, f)
+        json.dump(seed_bc, f)
 
-    print(f"Splits created:")
-    print(f"  Test set:       {len(test_indices)} ({len(test_indices)/dataset.n_samples*100:.1f}%)")
-    print(f"  Initial seed:   {len(seed_indices)} ({len(seed_indices)/dataset.n_samples*100:.1f}%)")
-    print(f"  Unlabeled pool: {len(remaining_pool_indices)} ({len(remaining_pool_indices)/dataset.n_samples*100:.1f}%)")
-
-    return test_indices, remaining_pool_indices, seed_indices
+    return test_idx, remaining_pool_idx, seed_idx
 
 
 def make_dataloader(dataset, indices, batch_size=256, shuffle=True):
-    """Create a DataLoader for a subset of indices."""
+    """Utility to create a standard PyTorch DataLoader for a subset of the data."""
     subset = Subset(dataset, indices)
     return DataLoader(subset, batch_size=batch_size, shuffle=shuffle, num_workers=0)
+
